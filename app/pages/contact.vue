@@ -51,6 +51,7 @@
               </div>
               <div>
                 <h3 class="font-bold mb-1">Location</h3>
+                <p class="text-gray-600">Carrownahaun, Balla</p>
                 <p class="text-gray-600">Co. Mayo, Ireland</p>
                 <p class="text-sm text-gray-500 mt-2">Available for remote work & local meetings</p>
               </div>
@@ -95,12 +96,28 @@
           <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
             <h2 class="text-2xl font-bold mb-6">Send Me a Message</h2>
             
-            <form @submit.prevent="handleSubmit" class="space-y-6">
+            <form 
+              name="contact" 
+              method="POST" 
+              data-netlify="true"
+              data-netlify-honeypot="bot-field"
+              @submit.prevent="handleSubmit" 
+              class="space-y-6"
+            >
+              <!-- Hidden fields for Netlify -->
+              <input type="hidden" name="form-name" value="contact" />
+              <p class="hidden">
+                <label>
+                  Don't fill this out if you're human: <input name="bot-field" />
+                </label>
+              </p>
+
               <div>
                 <label class="block text-gray-700 font-semibold mb-2">Your Name *</label>
                 <input 
                   v-model="form.name" 
                   type="text" 
+                  name="name"
                   required 
                   placeholder="John Doe"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -112,6 +129,7 @@
                 <input 
                   v-model="form.email" 
                   type="email" 
+                  name="email"
                   required 
                   placeholder="john@example.com"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -123,6 +141,7 @@
                 <input 
                   v-model="form.phone" 
                   type="tel" 
+                  name="phone"
                   placeholder="+353 ..."
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
@@ -132,6 +151,7 @@
                 <label class="block text-gray-700 font-semibold mb-2">Project Type</label>
                 <select 
                   v-model="form.projectType" 
+                  name="projectType"
                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   <option value="">Select a project type</option>
@@ -147,6 +167,7 @@
                 <label class="block text-gray-700 font-semibold mb-2">Tell Me About Your Project *</label>
                 <textarea 
                   v-model="form.message" 
+                  name="message"
                   required 
                   rows="5" 
                   placeholder="Describe your project, timeline, budget range, or any specific requirements..."
@@ -170,6 +191,15 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p class="text-green-800 font-semibold">Thank you! I'll get back to you within 24 hours.</p>
+              </div>
+            </div>
+
+            <div v-if="error" class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div class="flex items-center">
+                <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-red-800 font-semibold">Sorry, there was an error. Please email me directly at mcguireryanp@gmail.com</p>
               </div>
             </div>
           </div>
@@ -217,27 +247,48 @@ const form = ref({
 
 const submitted = ref(false)
 const isSubmitting = ref(false)
+const error = ref(false)
 
 const handleSubmit = async () => {
   isSubmitting.value = true
+  error.value = false
   
-  // Simulate form submission (replace with actual API call)
-  setTimeout(() => {
-    console.log('Form submitted:', form.value)
-    submitted.value = true
-    isSubmitting.value = false
+  try {
+    const response = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        'form-name': 'contact',
+        'name': form.value.name,
+        'email': form.value.email,
+        'phone': form.value.phone,
+        'projectType': form.value.projectType,
+        'message': form.value.message
+      }).toString()
+    })
     
-    // Reset form after 5 seconds
-    setTimeout(() => {
-      form.value = { 
-        name: '', 
-        email: '', 
-        phone: '',
-        projectType: '',
-        message: '' 
-      }
-      submitted.value = false
-    }, 5000)
-  }, 1000)
+    if (response.ok) {
+      submitted.value = true
+      isSubmitting.value = false
+      
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        form.value = { 
+          name: '', 
+          email: '', 
+          phone: '',
+          projectType: '',
+          message: '' 
+        }
+        submitted.value = false
+      }, 5000)
+    } else {
+      throw new Error('Form submission failed')
+    }
+  } catch (err) {
+    console.error('Error:', err)
+    error.value = true
+    isSubmitting.value = false
+  }
 }
 </script>
