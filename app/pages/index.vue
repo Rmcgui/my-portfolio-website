@@ -11,8 +11,8 @@
             From responsive websites to custom web solutions—I bring technical expertise and practical problem-solving to every project.
           </p>
           <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <NuxtLink to="/process" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-              View The Process
+            <NuxtLink to="/projects" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+              View My Work
             </NuxtLink>
             <NuxtLink to="/contact" class="bg-transparent border-2 border-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
               Get In Touch
@@ -59,6 +59,20 @@
               Bespoke solutions for unique business needs—dashboards, data management systems, process automation, and more.
             </p>
           </div>
+        </div>
+
+        <!-- CTA Button to Projects -->
+        <div class="text-center mt-12">
+          <NuxtLink 
+            to="/projects" 
+            class="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            <span>View My Work</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </NuxtLink>
+          <p class="text-sm text-gray-600 mt-3">See real examples of enterprise applications I've built</p>
         </div>
       </div>
     </section>
@@ -219,21 +233,3 @@
 <script setup>
 // Component is ready
 </script>
-
-<style scoped>
-.hero {
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-  pointer-events: none;
-}
-</style>
