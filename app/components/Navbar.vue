@@ -21,6 +21,10 @@
           >
             About
           </NuxtLink>
+          <NuxtLink to="/process"
+            class="text-gray-600 hover:text-blue-600 transition-colors duration-200 font-medium"
+            :class="{ 'text-blue-600 font-semibold': $route.path === '/process' }"
+          >How It Works</NuxtLink>
           <NuxtLink 
             to="/projects" 
             class="text-gray-600 hover:text-blue-600 transition-colors duration-200 font-medium"

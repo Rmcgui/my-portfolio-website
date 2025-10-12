@@ -94,11 +94,11 @@
             <span>Built with Vue.js & Nuxt</span>
             <span class="hidden md:inline">•</span>
             <span class="flex items-center">
-              Made in 
+              Made with  
               <svg class="w-4 h-4 mx-1 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
               </svg>
-              Ireland
+              in Ireland
             </span>
           </div>
         </div>
