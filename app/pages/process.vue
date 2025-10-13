@@ -12,17 +12,20 @@
 
       <!-- Process Timeline -->
       <div class="relative">
-        <!-- Vertical Timeline Bar (desktop only) -->
-        <div class="hidden md:block absolute left-20 top-0 bottom-0 w-0.5 bg-blue-200"></div>
-
-        <div class="space-y-8">
+        <div class="space-y-4">
           <!-- Step 1 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
+              <!-- Circle -->
               <div class="w-12 h-12 md:w-16 md:h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 1
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">30-45 min</p>
+              <!-- Duration text -->
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">30-45 min</p>
+              <!-- Spacer div to push line down -->
+              <div class="h-2"></div>
+              <!-- Vertical line starts after spacer -->
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-blue-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-blue-600">Initial Consultation</h3>
@@ -46,11 +49,13 @@
 
           <!-- Step 2 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 2
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">2-3 days</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">2-3 days</p>
+              <div class="h-2"></div>
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-green-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-green-600">Proposal & Quote</h3>
@@ -74,11 +79,13 @@
 
           <!-- Step 3 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 3
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">1 day</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">1 day</p>
+              <div class="h-2"></div>
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-purple-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-purple-600">Agreement & Deposit</h3>
@@ -101,11 +108,13 @@
 
           <!-- Step 4 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 4
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">3-5 days</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">3-5 days</p>
+              <div class="h-2"></div>
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-orange-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-orange-600">Design & Planning</h3>
@@ -129,11 +138,13 @@
 
           <!-- Step 5 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 5
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">2-4 weeks</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">2-4 weeks</p>
+              <div class="h-2"></div>
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-blue-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-blue-600">Development</h3>
@@ -157,11 +168,13 @@
 
           <!-- Step 6 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 6
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">3-5 days</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">3-5 days</p>
+              <div class="h-2"></div>
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-teal-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-teal-600">Review & Revisions</h3>
@@ -185,11 +198,13 @@
 
           <!-- Step 7 -->
           <div class="relative flex gap-4 md:gap-6">
-            <div class="flex-shrink-0 flex flex-col items-center">
+            <div class="flex-shrink-0 flex flex-col items-center relative">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 7
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">1-2 days</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10 bg-gray-50">1-2 days</p>
+              <div class="h-2"></div>
+              <div class="absolute left-6 md:left-8 top-20 md:top-24 bottom-0 w-0.5 bg-blue-200"></div>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-green-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-green-600">Launch & Handover</h3>
@@ -211,13 +226,13 @@
             </div>
           </div>
 
-          <!-- Step 8 -->
+          <!-- Step 8 - Last step, no line below -->
           <div class="relative flex gap-4 md:gap-6">
             <div class="flex-shrink-0 flex flex-col items-center">
               <div class="w-12 h-12 md:w-16 md:h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-2xl shadow-lg relative z-10">
                 8
               </div>
-              <p class="text-xs text-gray-600 font-semibold mt-2">Ongoing</p>
+              <p class="text-xs text-gray-600 font-semibold mt-2 relative z-10">Ongoing</p>
             </div>
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-indigo-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-indigo-600">Ongoing Support (Optional)</h3>
