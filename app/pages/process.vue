@@ -30,7 +30,7 @@
             <div class="flex-1 bg-white p-4 md:p-6 rounded-lg shadow-lg border-2 border-blue-200">
               <h3 class="text-xl md:text-2xl font-bold mb-3 text-blue-600">Initial Consultation</h3>
               <p class="text-sm md:text-base text-gray-700 mb-3">
-                We'll have a casual, no-pressure conversation (phone, video, or coffee) to discuss your business, goals, and what you're looking for in a website.
+                We'll have a casual, no-pressure conversation to discuss your business, goals, and what you're looking for in a website.
               </p>
               <div class="text-xs md:text-sm text-gray-600 space-y-2">
                 <p><strong>What happens:</strong></p>
@@ -356,11 +356,6 @@
           <div class="bg-white rounded-lg shadow-md p-4 md:p-6 border border-gray-200">
             <h3 class="font-bold text-base md:text-lg mb-2">Will I own the website?</h3>
             <p class="text-gray-700 text-sm">Yes! Once final payment is made, you own all the content and files. I retain the right to showcase the project in my portfolio unless you prefer otherwise.</p>
-          </div>
-
-          <div class="bg-white rounded-lg shadow-md p-4 md:p-6 border border-gray-200">
-            <h3 class="font-bold text-base md:text-lg mb-2">Do you offer payment plans?</h3>
-            <p class="text-gray-700 text-sm">Yes, I'm flexible. The standard structure is 50% upfront and 50% on completion, but we can discuss alternatives that work for your budget.</p>
           </div>
 
           <div class="bg-white rounded-lg shadow-md p-4 md:p-6 border border-gray-200">

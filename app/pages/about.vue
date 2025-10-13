@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto px-6 py-16">
-    <h1 class="text-4xl font-bold mb-8">About Ryan McGuire</h1>
+    <h1 class="text-4xl font-bold mb-8">About Me</h1>
     
     <div class="grid md:grid-cols-2 gap-12">
       <div>
@@ -56,40 +56,6 @@
           <h4 class="text-xl font-bold mb-3 text-blue-600">End-to-End Ownership</h4>
           <p class="text-gray-700">
             From initial consultation through deployment and beyond, I'm with you every step of the way. I handle version control, testing, deployment pipelines, and ongoing support—no need to coordinate multiple vendors.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-12 bg-blue-50 p-8 rounded-lg border border-blue-100">
-      <h3 class="text-2xl font-bold mb-6">Recent Project Highlights</h3>
-      
-      <div class="space-y-6">
-        <div>
-          <h4 class="font-bold text-lg text-blue-700">Material Management Web Application</h4>
-          <p class="text-gray-700 mt-2">
-            Led development of a full-stack Vue.js and C# application that streamlined complex manufacturing operations, reducing process states from 50 to just 6. Designed intuitive user interfaces and implemented robust backend state management for mission-critical operations.
-          </p>
-        </div>
-
-        <div>
-          <h4 class="font-bold text-lg text-blue-700">Real-Time Manufacturing Dashboards</h4>
-          <p class="text-gray-700 mt-2">
-            Built JavaScript-based web applications using Sencha ExtJS that empowered production operators to resolve issues independently, significantly reducing IT support requests and improving operational efficiency.
-          </p>
-        </div>
-
-        <div>
-          <h4 class="font-bold text-lg text-blue-700">Legacy System Modernization</h4>
-          <p class="text-gray-700 mt-2">
-            Migrated enterprise applications from traditional server architecture to modern containerized deployments using Docker and Kubernetes, improving scalability, reliability, and deployment consistency.
-          </p>
-        </div>
-
-        <div>
-          <h4 class="font-bold text-lg text-blue-700">Custom Verification Systems</h4>
-          <p class="text-gray-700 mt-2">
-            Developed bespoke web service applications with C# to enforce quality standards, verify materials, and enhance data traceability—ensuring accuracy and compliance in high-stakes environments.
           </p>
         </div>
       </div>
@@ -189,7 +155,7 @@
       <h3 class="text-2xl font-bold mb-4">My Approach</h3>
       <div class="space-y-4 text-gray-700">
         <p>
-          <span class="font-semibold text-gray-900">Clear Communication:</span> I take time to understand your business, your challenges, and your vision. No jargon, no assumptions—just straightforward conversations about what you need and how we'll get there.
+          <span class="font-semibold text-gray-900">Clear Communication:</span> I take time to understand your business, your challenges, and your vision. No assumptions—just straightforward conversations about what you need and how we'll get there.
         </p>
         <p>
           <span class="font-semibold text-gray-900">Quality First:</span> I'm committed to delivering work I'm proud of. That means thorough testing, clean code, responsive design, and attention to details that make the difference between "okay" and exceptional.
@@ -225,9 +191,11 @@
       <p class="text-xl mb-6">
         Whether you're looking to establish your online presence, modernize an existing system, or build a custom web application, I'd love to hear about your project.
       </p>
-      <p class="text-lg">
-        Based in Co. Mayo, Ireland, working with businesses locally and remotely.
-      </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <NuxtLink to="/contact" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl inline-block">
+            Get In Touch
+          </NuxtLink>
+        </div>
     </div>
   </div>
 </template>
