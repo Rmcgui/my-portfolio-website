@@ -1,12 +1,12 @@
 <template>
   <div class="container mx-auto px-6 py-16">
-    <h1 class="text-4xl font-bold mb-8">About Me</h1>
+    <h1 class="text-4xl font-bold mb-8">About Ryan McGuire</h1>
     
     <div class="grid md:grid-cols-2 gap-12">
       <div>
         <div class="h-96 rounded-lg overflow-hidden border-2 border-blue-200 shadow-lg">
           <img 
-            src="/images/Portrait.jpg" 
+            src="/images/ryan-profile.jpg" 
             alt="Ryan McGuire - Software Developer"
             class="w-full h-full object-cover"
           />
@@ -97,35 +97,89 @@
 
     <div class="mt-16">
       <h3 class="text-2xl font-bold mb-8">Technologies & Skills</h3>
+      <p class="text-lg text-gray-600 max-w-2xl mb-8">
+        Modern technologies and proven expertise across the full development stack
+      </p>
       
-      <div class="space-y-6">
+      <div class="space-y-8">
+        <!-- Frontend -->
         <div>
-          <h4 class="font-semibold text-lg mb-3 text-gray-800">Frontend Development</h4>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center border border-green-200 font-medium">Vue.js</div>
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center border border-blue-200 font-medium">JavaScript</div>
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg text-center border border-orange-200 font-medium">HTML5</div>
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg text-center border border-purple-200 font-medium">CSS3</div>
+          <h4 class="text-xl font-semibold mb-4 text-gray-800">Frontend Development</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-green-500">
+              <div class="text-3xl mb-2">⚡</div>
+              <h5 class="font-bold text-lg">Vue.js</h5>
+              <p class="text-sm text-gray-600 mt-1">Reactive UIs</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-yellow-500">
+              <div class="text-3xl mb-2">📜</div>
+              <h5 class="font-bold text-lg">JavaScript</h5>
+              <p class="text-sm text-gray-600 mt-1">ES6+ Modern JS</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-orange-500">
+              <div class="text-3xl mb-2">🎨</div>
+              <h5 class="font-bold text-lg">HTML & CSS</h5>
+              <p class="text-sm text-gray-600 mt-1">Responsive Design</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-blue-500">
+              <div class="text-3xl mb-2">💨</div>
+              <h5 class="font-bold text-lg">Tailwind CSS</h5>
+              <p class="text-sm text-gray-600 mt-1">Modern Styling</p>
+            </div>
           </div>
         </div>
 
+        <!-- Backend -->
         <div>
-          <h4 class="font-semibold text-lg mb-3 text-gray-800">Backend Development</h4>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg text-center border border-purple-200 font-medium">C# / .NET Core</div>
-            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg text-center border border-green-200 font-medium">Node.js</div>
-            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg text-center border border-yellow-200 font-medium">Python</div>
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center border border-blue-200 font-medium">Web APIs</div>
+          <h4 class="text-xl font-semibold mb-4 text-gray-800">Backend Development</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-purple-500">
+              <div class="text-3xl mb-2">🔷</div>
+              <h5 class="font-bold text-lg">C# / .NET</h5>
+              <p class="text-sm text-gray-600 mt-1">Enterprise APIs</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-green-600">
+              <div class="text-3xl mb-2">🟢</div>
+              <h5 class="font-bold text-lg">Node.js</h5>
+              <p class="text-sm text-gray-600 mt-1">Server-side JS</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-blue-600">
+              <div class="text-3xl mb-2">🐍</div>
+              <h5 class="font-bold text-lg">Python</h5>
+              <p class="text-sm text-gray-600 mt-1">Scripting & APIs</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-indigo-500">
+              <div class="text-3xl mb-2">🔌</div>
+              <h5 class="font-bold text-lg">REST APIs</h5>
+              <p class="text-sm text-gray-600 mt-1">Web Services</p>
+            </div>
           </div>
         </div>
 
+        <!-- Database & Tools -->
         <div>
-          <h4 class="font-semibold text-lg mb-3 text-gray-800">Database & DevOps</h4>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center border border-blue-200 font-medium">SQL Server</div>
-            <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-lg text-center border border-teal-200 font-medium">MySQL</div>
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg text-center border border-blue-200 font-medium">Docker</div>
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg text-center border border-orange-200 font-medium">Git / GitLab</div>
+          <h4 class="text-xl font-semibold mb-4 text-gray-800">Database & DevOps</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-blue-700">
+              <div class="text-3xl mb-2">🗄️</div>
+              <h5 class="font-bold text-lg">SQL Server</h5>
+              <p class="text-sm text-gray-600 mt-1">Database Design</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-teal-500">
+              <div class="text-3xl mb-2">🐬</div>
+              <h5 class="font-bold text-lg">MySQL</h5>
+              <p class="text-sm text-gray-600 mt-1">Relational DBs</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-blue-400">
+              <div class="text-3xl mb-2">🐳</div>
+              <h5 class="font-bold text-lg">Docker</h5>
+              <p class="text-sm text-gray-600 mt-1">Containerization</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center border-l-4 border-orange-600">
+              <div class="text-3xl mb-2">🔀</div>
+              <h5 class="font-bold text-lg">Git</h5>
+              <p class="text-sm text-gray-600 mt-1">Version Control</p>
+            </div>
           </div>
         </div>
       </div>
