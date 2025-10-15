@@ -2,8 +2,13 @@
   <nav class="bg-white shadow-md sticky top-0 z-50">
     <div class="container mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
-        <NuxtLink to="/" class="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors">
-          Ryan McGuire
+        <NuxtLink to="/" class="flex items-center hover:opacity-80 transition-opacity">
+          <!-- Logo Image - save the SVG file to /public/logo.svg -->
+          <img 
+            src="/logo.svg" 
+            alt="Web Design by Ryan Logo" 
+            class="h-12 md:h-16 w-auto"
+          />
         </NuxtLink>
         
         <div class="hidden md:flex space-x-8 items-center">
@@ -78,7 +83,7 @@
           <NuxtLink 
             to="/process" 
             class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-all font-medium"
-            :class="{ 'text-blue-600 bg-blue-50 font-semibold': $route.path === '/projects' }"
+            :class="{ 'text-blue-600 bg-blue-50 font-semibold': $route.path === '/process' }"
             @click="closeMenu"
           >
             How It Works
