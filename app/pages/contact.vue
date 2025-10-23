@@ -22,8 +22,8 @@
               </div>
               <div>
                 <h3 class="font-bold mb-1">Email</h3>
-                <a href="mailto:mcguireryanp@gmail.com" class="text-blue-600 hover:text-blue-800 hover:underline">
-                  mcguireryanp@gmail.com
+                <a href="mailto:ryan@webdesignbyryan.com" class="text-blue-600 hover:text-blue-800 hover:underline">
+                  ryan@webdesignbyryan.com
                 </a>
               </div>
             </div>
@@ -39,6 +39,8 @@
                 <a href="tel:+353838934120" class="text-blue-600 hover:text-blue-800 hover:underline">
                   +353 83 893 4120
                 </a>
+                <p class="text-sm text-gray-500 mt-1">Available Mon-Fri, 9am-6pm GMT</p>
+                <p class="text-sm text-gray-500">For urgent matters, feel free to call directly.</p>
               </div>
             </div>
 
@@ -51,41 +53,9 @@
               </div>
               <div>
                 <h3 class="font-bold mb-1">Location</h3>
-                <p class="text-gray-600">Carrownahaun, Balla</p>
+                <p class="text-gray-600">Balla</p>
                 <p class="text-gray-600">Co. Mayo, Ireland</p>
-                <p class="text-sm text-gray-500 mt-2">Available for remote work & local meetings</p>
-              </div>
-            </div>
-
-            <div class="flex items-start">
-              <div class="bg-blue-100 p-3 rounded-lg mr-4 flex-shrink-0">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-bold mb-1">Connect With Me</h3>
-                <div class="flex flex-col space-y-2 mt-2">
-                  <a href="https://www.linkedin.com/in/ryan-mcguire-82a8b3113" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                    LinkedIn Profile
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Response Time Info -->
-          <div class="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
-            <div class="flex items-start">
-              <svg class="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 class="font-bold text-green-800 mb-2">Quick Response Time</h3>
-                <p class="text-sm text-gray-700">I typically respond to inquiries within 24 hours on business days. For urgent matters, feel free to call directly.</p>
+                <p class="text-sm text-gray-500 mt-1">Serving clients across Ireland and internationally</p>
               </div>
             </div>
           </div>
@@ -97,21 +67,10 @@
             <h2 class="text-2xl font-bold mb-6">Send Me a Message</h2>
             
             <form 
-              name="contact" 
-              method="POST" 
-              data-netlify="true"
-              data-netlify-honeypot="bot-field"
+              ref="contactForm"
               @submit.prevent="handleSubmit" 
               class="space-y-6"
             >
-              <!-- Hidden fields for Netlify -->
-              <input type="hidden" name="form-name" value="contact" />
-              <p class="hidden">
-                <label>
-                  Don't fill this out if you're human: <input name="bot-field" />
-                </label>
-              </p>
-
               <div>
                 <label class="block text-gray-700 font-semibold mb-2">Your Name *</label>
                 <input 
@@ -128,7 +87,7 @@
                 <label class="block text-gray-700 font-semibold mb-2">Your Email *</label>
                 <input 
                   v-model="form.email" 
-                  type="email" 
+                  type="email"
                   name="email"
                   required 
                   placeholder="john@example.com"
@@ -199,7 +158,7 @@
                 <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-red-800 font-semibold">Sorry, there was an error. Please email me directly at mcguireryanp@gmail.com</p>
+                <p class="text-red-800 font-semibold">Sorry, there was an error. Please email me directly at ryan@webdesignbyryan.com</p>
               </div>
             </div>
           </div>
@@ -236,7 +195,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import emailjs from '@emailjs/browser'
 
+// REPLACE THESE WITH YOUR EMAILJS CREDENTIALS
+const EMAILJS_SERVICE_ID = 'service_89wu05e' // Replace with your Service ID
+const EMAILJS_TEMPLATE_ID = 'template_hsj4mdh' // Replace with your Template ID
+const EMAILJS_PUBLIC_KEY = 'g-qEkL7XICQII1N4X' // Replace with your Public Key
+
+const contactForm = ref(null)
 const form = ref({
   name: '',
   email: '',
@@ -254,39 +220,39 @@ const handleSubmit = async () => {
   error.value = false
   
   try {
-    const response = await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        'form-name': 'contact',
-        'name': form.value.name,
-        'email': form.value.email,
-        'phone': form.value.phone,
-        'projectType': form.value.projectType,
-        'message': form.value.message
-      }).toString()
-    })
-    
-    if (response.ok) {
-      submitted.value = true
-      isSubmitting.value = false
-      
-      // Reset form after 5 seconds
-      setTimeout(() => {
-        form.value = { 
-          name: '', 
-          email: '', 
-          phone: '',
-          projectType: '',
-          message: '' 
-        }
-        submitted.value = false
-      }, 5000)
-    } else {
-      throw new Error('Form submission failed')
+    // Prepare template params with correct naming for EmailJS
+    const templateParams = {
+      from_name: form.value.name,
+      from_email: form.value.email,
+      phone: form.value.phone || 'Not provided',
+      projectType: form.value.projectType || 'Not specified',
+      message: form.value.message
     }
+    
+    // Send email using EmailJS
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams,
+      EMAILJS_PUBLIC_KEY
+    )
+    
+    submitted.value = true
+    isSubmitting.value = false
+    
+    // Reset form after 5 seconds
+    setTimeout(() => {
+      form.value = { 
+        name: '', 
+        email: '', 
+        phone: '',
+        projectType: '',
+        message: '' 
+      }
+      submitted.value = false
+    }, 5000)
   } catch (err) {
-    console.error('Error:', err)
+    console.error('EmailJS Error:', err)
     error.value = true
     isSubmitting.value = false
   }

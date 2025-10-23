@@ -13,14 +13,7 @@ export default defineNuxtConfig({
         { property: 'og:title', content: 'Ryan McGuire | Full-Stack Web Developer in Mayo' },
         { property: 'og:description', content: 'Professional web developer specializing in custom web applications and business websites in Ireland.' },
         { property: 'og:type', content: 'website' },
-        { property: 'og:url', content: 'https://yourwebsite.com' },
-        { property: 'og:image', content: 'https://yourwebsite.com/og-image.jpg' },
-        
-        // Twitter Card
-        { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:title', content: 'Ryan McGuire | Full-Stack Web Developer' },
-        { name: 'twitter:description', content: 'Building modern web applications for businesses in Ireland' },
-        { name: 'twitter:image', content: 'https://yourwebsite.com/twitter-image.jpg' },
+        { property: 'og:url', content: 'https://webdesignbyryan.netlify.app' },
         
         // Additional
         { name: 'author', content: 'Ryan McGuire' },
@@ -28,11 +21,11 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-        { rel: 'canonical', href: 'https://yourwebsite.com' }
+        { rel: 'canonical', href: 'https://webdesignbyryan.netlify.app' }
       ]
     }
   }, 
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss']
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/sitemap']
 })
