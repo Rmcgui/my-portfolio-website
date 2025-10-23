@@ -170,7 +170,15 @@
 </template>
 
 <script setup>
-// Component is ready
+useHead({
+  title: 'Ryan McGuire | Web Developer in Mayo - Custom Websites & Web Applications',
+  meta: [
+    { name: 'description', content: 'Professional web developer in County Mayo, Ireland. Building custom websites, web applications, and e-commerce solutions for Irish businesses. Get a free consultation today!' },
+    { property: 'og:title', content: 'Ryan McGuire | Web Developer in Mayo' },
+    { property: 'og:url', content: 'https://webdesignbyryan.com' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://webdesignbyryan.com' }]
+})
 </script>
 
 <style scoped>

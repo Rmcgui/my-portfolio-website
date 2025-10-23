@@ -194,6 +194,17 @@
 </template>
 
 <script setup>
+
+useHead({
+  title: 'Contact Ryan McGuire - Get Your Free Web Development Consultation',
+  meta: [
+    { name: 'description', content: 'Contact Ryan McGuire for a free consultation about your website or web application project. Based in Mayo, serving businesses across Ireland.' },
+    { property: 'og:title', content: 'Contact - Ryan McGuire Web Developer' },
+    { property: 'og:url', content: 'https://webdesignbyryan.com/contact' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://webdesignbyryan.com/contact' }]
+});
+
 import { ref } from 'vue'
 import emailjs from '@emailjs/browser'
 
@@ -257,4 +268,6 @@ const handleSubmit = async () => {
     isSubmitting.value = false
   }
 }
+
 </script>
+

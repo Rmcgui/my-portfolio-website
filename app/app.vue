@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col">
+    <StructuredData />
     <Navbar />
     <main class="flex-grow">
       <NuxtPage />

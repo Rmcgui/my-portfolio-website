@@ -380,5 +380,13 @@
 </template>
 
 <script setup>
-// Component is ready
+useHead({
+  title: 'How It Works - Web Development Process & Pricing | Ryan McGuire',
+  meta: [
+    { name: 'description', content: 'Learn about my 6-week web development process and transparent pricing. From consultation to launch, see how I build professional websites for Irish businesses.' },
+    { property: 'og:title', content: 'Web Development Process & Pricing - Ryan McGuire' },
+    { property: 'og:url', content: 'https://webdesignbyryan.com/process' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://webdesignbyryan.com/process' }]
+})
 </script>

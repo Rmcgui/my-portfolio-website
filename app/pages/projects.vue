@@ -268,5 +268,13 @@
 </template>
 
 <script setup>
-// Component is ready
+useHead({
+  title: 'Web Development Projects - Portfolio by Ryan McGuire',
+  meta: [
+    { name: 'description', content: 'View my web development portfolio featuring custom websites, web applications, and e-commerce solutions built for businesses across Ireland.' },
+    { property: 'og:title', content: 'Web Development Portfolio - Ryan McGuire' },
+    { property: 'og:url', content: 'https://webdesignbyryan.com/projects' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://webdesignbyryan.com/projects' }]
+})
 </script>
