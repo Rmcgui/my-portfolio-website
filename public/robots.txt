@@ -1,2 +1,4 @@
 User-Agent: *
 Disallow:
+
+Sitemap: https://webdesignbyryan.com/sitemap.xml
