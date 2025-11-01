@@ -4,11 +4,11 @@
     
     <div class="grid md:grid-cols-2 gap-12">
       <div>
-        <div class="h-96 rounded-lg overflow-hidden border-2 border-blue-200 shadow-lg">
+        <div class="h-[500px] rounded-lg overflow-hidden border-2 border-blue-200 shadow-lg">
           <img 
             src="/images/ryan-profile.jpg" 
             alt="Ryan McGuire - Software Developer"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-cover object-[center_35%]"
           />
         </div>
       </div>
