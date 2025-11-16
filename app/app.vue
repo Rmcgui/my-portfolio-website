@@ -3,7 +3,9 @@
     <StructuredData />
     <Navbar />
     <main class="flex-grow">
+      <NuxtLayout>
       <NuxtPage />
+      </NuxtLayout>
     </main>
     <Footer />
   </div>

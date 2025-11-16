@@ -1,14 +1,225 @@
 <template>
   <div class="container mx-auto px-6 py-16">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">My Work</h1>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          A showcase of professional projects and custom solutions I've built for real-world applications
-        </p>
+
+    <!-- Projects hero + live demos wrapper -->
+    <section class="relative mb-20">
+      <!-- Soft gradient background behind the whole top area -->
+      <div
+        class="pointer-events-none absolute inset-x-0 -top-32 -z-10 h-60 bg-gradient-to-b from-emerald-50/60 via-white to-white"
+      ></div>
+
+      <div class="max-w-6xl mx-auto">
+        <!-- Header: My Work -->
+        <div class="max-w-4xl mx-auto text-center mb-8">
+          <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">
+            My Work
+          </h1>
+          <p class="text-lg text-slate-600">
+            A showcase of professional projects and custom solutions I've built for real-world applications
+          </p>
+        </div>
+
+        <!-- Card that contains the demo projects section -->
+        <div
+          class="mx-auto max-w-6xl rounded-3xl bg-white/90 backdrop-blur border border-slate-100 shadow-[0_18px_60px_rgba(15,23,42,0.08)] px-5 py-6 md:px-10 md:py-10 transition-transform duration-300 hover:-translate-y-1"
+        >
+          <!-- ⬇️ PASTE YOUR EXISTING LIVE DEMO <section class="mb-16"> ... </section> HERE ⬇️ -->
+
+          <!-- Live Demo Websites -->
+          <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-2 flex items-center">
+              <span class="bg-emerald-600 text-white px-3 py-1 rounded-lg mr-3 text-sm">
+                LIVE DEMOS
+              </span>
+              Demo Websites &amp; Templates
+            </h2>
+            <p class="text-gray-600 mb-8 max-w-2xl">
+              Click into these live demo sites to see how I approach UX, responsive layouts, and
+              modern front-end development for small businesses.
+            </p>
+<div class="grid gap-8 md:grid-cols-2">
+    <!-- E-commerce demo (real, live link) -->
+    <NuxtLink
+      to="/shop"
+      class="group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+    >
+      <div class="relative overflow-hidden aspect-[16/9]">
+        <!-- Replace with your actual screenshot -->
+        <img
+          src="/images/ecommerce-hero.jpg"
+          alt="E-commerce store demo preview"
+          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"
+        ></div>
+
+        <span
+          class="absolute top-3 left-3 bg-emerald-500 text-white text-[11px] font-semibold tracking-wide px-3 py-1 rounded-full shadow-md"
+        >
+          LIVE DEMO
+        </span>
+        <span
+          class="absolute bottom-3 left-3 text-xs font-medium text-white/90 bg-black/40 backdrop-blur px-2 py-1 rounded-md"
+        >
+          Nuxt 3 · Tailwind CSS
+        </span>
       </div>
 
-      <!-- Featured Professional Projects -->
+      <div class="p-6 flex-1 flex flex-col">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h3 class="text-xl font-semibold text-gray-900">
+            ShopHub: Modern E-commerce Storefront
+          </h3>
+          <span class="inline-flex items-center text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
+            View demo
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        </div>
+
+        <p class="text-sm text-gray-600 mb-4">
+          Product listing, featured collections, and a clean checkout flow designed for
+          small retail brands that want a fast, modern storefront.
+        </p>
+
+        <div class="mt-auto flex flex-wrap gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">Nuxt 3</span>
+          <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">Vue.js</span>
+          <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">Tailwind CSS</span>
+          <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">Responsive Design</span>
+        </div>
+      </div>
+    </NuxtLink>
+
+    <!-- Restaurant website placeholder -->
+    <div
+      class="group bg-white rounded-2xl shadow-lg overflow-hidden border border-dashed border-gray-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+    >
+      <div class="relative overflow-hidden aspect-[16/9] bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
+        <!-- Replace placeholder image later -->
+        <img
+          src="/images/restaurant-hero1.jpg"
+          alt="Restaurant website demo placeholder"
+          class="h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
+        />
+        <div class="absolute inset-0 bg-black/40 mix-blend-multiply"></div>
+
+        <div class="relative text-center px-6">
+          <span class="inline-flex items-center text-[11px] font-semibold text-amber-900 bg-amber-100/80 px-3 py-1 rounded-full mb-3">
+            Coming soon
+          </span>
+          <p class="text-sm text-white/90">
+            Local restaurant website with online menu, opening hours, and call-to-order CTA.
+          </p>
+        </div>
+      </div>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">
+          Restaurant Website Demo
+        </h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Designed for takeaways and restaurants that need a simple, mobile-first web
+          presence with an easy-to-update menu.
+        </p>
+        <div class="mt-auto flex items-center justify-between text-xs text-gray-500">
+          <span>Nuxt 3 · Strapi (planned)</span>
+          <span class="inline-flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            In progress
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gym / fitness website placeholder -->
+    <div
+      class="group bg-white rounded-2xl shadow-lg overflow-hidden border border-dashed border-gray-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+    >
+      <div class="relative overflow-hidden aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center">
+        <img
+          src="/images/gym-hero.jpg"
+          alt="Gym website demo placeholder"
+          class="h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
+        />
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="relative text-center px-6">
+          <span class="inline-flex items-center text-[11px] font-semibold text-sky-100 bg-sky-500/70 px-3 py-1 rounded-full mb-3">
+            Coming soon
+          </span>
+          <p class="text-sm text-white/90">
+            Gym / fitness studio site with timetable, membership options, and trainer profiles.
+          </p>
+        </div>
+      </div>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">
+          Gym / Fitness Studio Website
+        </h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Focused on clear calls-to-action, membership sign-ups, and mobile-first timetables
+          for busy, on-the-go clients.
+        </p>
+        <div class="mt-auto flex items-center justify-between text-xs text-gray-500">
+          <span>Nuxt 3 · CMS (planned)</span>
+          <span>Wireframing stage</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Small business / services placeholder -->
+    <div
+      class="group bg-white rounded-2xl shadow-lg overflow-hidden border border-dashed border-gray-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+    >
+      <div class="relative overflow-hidden aspect-[16/9] bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center">
+        <img
+          src="/images/small-business-hero.jpg"
+          alt="Small business website demo placeholder"
+          class="h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
+        />
+        <div class="absolute inset-0 bg-black/30 mix-blend-multiply"></div>
+        <div class="relative text-center px-6">
+          <span class="inline-flex items-center text-[11px] font-semibold text-indigo-900 bg-indigo-100/90 px-3 py-1 rounded-full mb-3">
+            Coming soon
+          </span>
+          <p class="text-sm text-white/95">
+            Clean, single-page service website for trades / local businesses with enquiry form.
+          </p>
+        </div>
+      </div>
+
+      <div class="p-6 flex-1 flex flex-col">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">
+          Small Business Landing Page
+        </h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Lightweight landing page template focused on clarity, trust, and quick contact.
+        </p>
+        <div class="mt-auto flex items-center justify-between text-xs text-gray-500">
+          <span>Nuxt 3 · Static</span>
+          <span>Planned template</span>
+        </div>
+      </div>
+    </div>
+  </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rest of projects: professional experience etc. -->
+    <div class="max-w-6xl mx-auto">
+    <!-- Featured Professional Projects -->
       <div class="mb-16">
         <h2 class="text-2xl font-bold mb-8 flex items-center">
           <span class="bg-blue-600 text-white px-3 py-1 rounded-lg mr-3 text-sm">PROFESSIONAL</span>
@@ -183,6 +394,46 @@
         </h2>
         
         <div class="grid md:grid-cols-2 gap-6">
+          <!-- E-commerce website demo -->>
+           <!-- E-Commerce Store Demo -->
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-200">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 h-40 flex items-center justify-center">
+              <div class="text-white text-center">
+                <div class="text-5xl mb-2">🛒</div>
+                <h3 class="text-xl font-bold">E-Commerce Store</h3>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <h3 class="text-xl font-bold mb-2">ShopHub – E-Commerce Demo</h3>
+              <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-3 font-semibold">
+                TEMPLATE PROJECT
+              </span>
+
+              <p class="text-gray-600 mb-4 text-sm">
+                A complete e-commerce storefront demo built with Vue, Nuxt, Tailwind and Pinia. 
+                Includes product listings, product detail pages, a shopping cart, and checkout — 
+                all integrated directly into this portfolio website.
+              </p>
+
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Vue.js</span>
+                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Nuxt</span>
+                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Pinia</span>
+                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Tailwind</span>
+              </div>
+
+              <NuxtLink
+                to="/shop"
+                class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                View Demo
+              </NuxtLink>
+            </div>
+          </div>
+
+
+
           <!-- GPS Tracking Application -->
           <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-200">
             <div class="bg-gradient-to-br from-teal-400 to-teal-600 h-40 flex items-center justify-center">
@@ -268,6 +519,8 @@
 </template>
 
 <script setup>
+
+// SEO 
 useHead({
   title: 'Web Development Projects - Portfolio by Ryan McGuire',
   meta: [
@@ -277,4 +530,5 @@ useHead({
   ],
   link: [{ rel: 'canonical', href: 'https://webdesignbyryan.com/projects' }]
 })
+
 </script>
