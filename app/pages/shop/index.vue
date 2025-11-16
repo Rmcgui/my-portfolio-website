@@ -283,4 +283,31 @@ onMounted(() => {
     cartStore.loadFromLocalStorage()
   }
 })
+
+useHead({
+  title: 'Modern E-Commerce Demo | Web Design by Ryan',
+  meta: [
+    {
+      name: 'description',
+      content:
+        'A fully responsive modern e-commerce storefront demo built with Nuxt 3, Vue.js, and Tailwind CSS. Showcasing product grids, hero sections, cart interactions, and mobile-first design.'
+    },
+    { name: 'robots', content: 'index, follow' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:title', content: 'Modern E-Commerce Demo' },
+    {
+      property: 'og:description',
+      content:
+        'Explore a live demo of a modern e-commerce site built using Nuxt 3 and Tailwind CSS.'
+    },
+    { property: 'og:image', content: '/images/projects/ecommerce-hero.jpg' },
+    { property: 'og:url', content: 'https://webdesignbyryan/shop' }
+  ],
+  link: [
+  {
+    rel: 'canonical',
+    href: 'https://webdesignbyryan.com/shop'
+  }
+]
+})
 </script>

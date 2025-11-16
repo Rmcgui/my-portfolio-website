@@ -97,6 +97,20 @@ useHead({
     {
       type: 'application/ld+json',
       children: JSON.stringify(structuredData)
+    },
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "E-Commerce Demo Website",
+        "description": "A modern e-commerce demo site built with Nuxt and Tailwind.",
+        "url": "https://webdesignbyryan.com/shop",
+        "creator": {
+          "@type": "Person",
+          "name": "Ryan"
+        }
+      })
     }
   ]
 })
