@@ -394,46 +394,6 @@
         </h2>
         
         <div class="grid md:grid-cols-2 gap-6">
-          <!-- E-commerce website demo -->>
-           <!-- E-Commerce Store Demo -->
-          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-200">
-            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 h-40 flex items-center justify-center">
-              <div class="text-white text-center">
-                <div class="text-5xl mb-2">🛒</div>
-                <h3 class="text-xl font-bold">E-Commerce Store</h3>
-              </div>
-            </div>
-
-            <div class="p-6">
-              <h3 class="text-xl font-bold mb-2">ShopHub – E-Commerce Demo</h3>
-              <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-3 font-semibold">
-                TEMPLATE PROJECT
-              </span>
-
-              <p class="text-gray-600 mb-4 text-sm">
-                A complete e-commerce storefront demo built with Vue, Nuxt, Tailwind and Pinia. 
-                Includes product listings, product detail pages, a shopping cart, and checkout — 
-                all integrated directly into this portfolio website.
-              </p>
-
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Vue.js</span>
-                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Nuxt</span>
-                <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Pinia</span>
-                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Tailwind</span>
-              </div>
-
-              <NuxtLink
-                to="/shop"
-                class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                View Demo
-              </NuxtLink>
-            </div>
-          </div>
-
-
-
           <!-- GPS Tracking Application -->
           <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-200">
             <div class="bg-gradient-to-br from-teal-400 to-teal-600 h-40 flex items-center justify-center">
