@@ -104,6 +104,14 @@
             Projects
           </NuxtLink>
           <NuxtLink 
+            to="/ai-planner" 
+            class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-all font-medium"
+            :class="{ 'text-blue-600 bg-blue-50 font-semibold': $route.path === '/ai-planner' }"
+            @click="closeMenu"
+          >
+          AI Planner 
+          </NuxtLink>
+          <NuxtLink 
             to="/contact" 
             class="block bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center shadow-md"
             @click="closeMenu"
