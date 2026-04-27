@@ -100,8 +100,7 @@ async function handleSubmitted(profile) {
       <div>
         <h1 class="text-2xl font-semibold mb-4">AI Website Planner</h1>
         <p class="text-sm text-slate-600 mb-4">
-          Describe your business and goals. I’ll generate a draft website structure and content
-          that we can refine together.
+          Describe your business and goals.
         </p>
         <IntakeForm
           :is-generating="isGenerating"
