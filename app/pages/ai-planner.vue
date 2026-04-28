@@ -154,24 +154,53 @@ async function handleSubmitted(profile) {
 
       <div class="bg-white rounded-xl border p-4 text-sm">
         <h2 class="font-medium mb-2">Pages & Content</h2>
+
         <div
           v-for="page in planner.plan.pages"
           :key="page.id"
-          class="border-b last:border-b-0 pb-3 mb-3"
+          class="border-b last:border-b-0 pb-4 mb-4"
         >
           <h3 class="font-semibold text-sm">{{ page.name }}</h3>
-          <p class="text-xs text-slate-500 mb-2">{{ page.purpose }}</p>
-          <ul class="text-xs text-slate-700">
-            <li
+          <p class="text-xs text-slate-500 mb-3">{{ page.purpose }}</p>
+
+          <div class="space-y-3">
+            <div
               v-for="section in page.sections"
               :key="section.id"
+              class="border rounded-lg p-3 bg-slate-50/60"
             >
-              <strong>{{ section.type }}</strong>
-              <span v-if="section.type === 'hero'">
-                – {{ (section).title }}
-              </span>
-            </li>
-          </ul>
+              <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                {{ section.type }} section
+              </p>
+
+              <!-- Hero -->
+              <template v-if="section.type === 'hero'">
+                <p class="font-semibold text-sm mb-1">{{ section.title }}</p>
+                <p class="text-xs text-slate-700 whitespace-pre-line mb-2">
+                  {{ section.body }}
+                </p>
+                <span
+                  v-if="section.primaryCtaLabel"
+                  class="inline-block text-[11px] px-2 py-1 rounded bg-blue-600 text-white"
+                >
+                  {{ section.primaryCtaLabel }}
+                </span>
+              </template>
+
+              <!-- Features (for when you add it later) -->
+              <template v-else-if="section.type === 'features'">
+                <p class="font-semibold text-sm mb-1">{{ section.heading }}</p>
+                <p v-if="section.intro" class="text-xs text-slate-700 mb-2">
+                  {{ section.intro }}
+                </p>
+                <ul class="text-xs text-slate-700 list-disc pl-4 space-y-1">
+                  <li v-for="(item, i) in section.items" :key="i">
+                    <strong>{{ item.title }}</strong> – {{ item.description }}
+                  </li>
+                </ul>
+              </template>
+            </div>
+          </div>
         </div>
       </div>
     </section>
