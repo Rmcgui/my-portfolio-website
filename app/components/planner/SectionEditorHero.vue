@@ -32,7 +32,7 @@ const handleRegenerate = () => {
       <label class="block">
         Title
         <input
-          class="mt-1 w-full border rounded px-2 py-1"
+          class="planner-input"
           :value="modelValue.title"
           @input="updateField('title', ($event.target as HTMLInputElement).value)"
         />
@@ -41,7 +41,7 @@ const handleRegenerate = () => {
       <label class="block">
         Body
         <textarea
-          class="mt-1 w-full border rounded px-2 py-1"
+          class="planner-input"
           rows="3"
           :value="modelValue.body"
           @input="updateField('body', ($event.target as HTMLTextAreaElement).value)"
@@ -52,7 +52,7 @@ const handleRegenerate = () => {
         <label class="block">
           Primary CTA label
           <input
-            class="mt-1 w-full border rounded px-2 py-1"
+            class="planner-input"
             :value="modelValue.primaryCtaLabel"
             @input="updateField('primaryCtaLabel', ($event.target as HTMLInputElement).value)"
           />
@@ -61,7 +61,7 @@ const handleRegenerate = () => {
         <label class="block">
           CTA target (optional)
           <input
-            class="mt-1 w-full border rounded px-2 py-1"
+            class="planner-input"
             :value="modelValue.primaryCtaTarget || ''"
             @input="updateField('primaryCtaTarget', ($event.target as HTMLInputElement).value)"
           />

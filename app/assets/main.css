@@ -24,4 +24,41 @@
   .input-field {
     @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none;
   }
+  
+  /* Cards */
+  .planner-card {
+    @apply bg-white rounded-xl border border-slate-100 p-4 text-base;
+  }
+  .planner-card-sm {
+    @apply bg-white rounded-xl border border-slate-100 p-3 text-sm;
+  }
+
+  /* Form inputs */
+  .planner-input {
+    @apply mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+  .planner-label {
+    @apply text-sm font-medium text-slate-700 block;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-4 py-2 rounded bg-blue-600 text-white text-sm font-medium
+           hover:bg-blue-700 disabled:opacity-50 transition-colors;
+  }
+  .btn-secondary {
+    @apply px-3 py-2 rounded border border-slate-300 text-sm
+           hover:bg-slate-50 transition-colors;
+  }
+  .btn-ghost {
+    @apply px-3 py-1.5 text-sm rounded border border-blue-600 text-blue-700
+           hover:bg-blue-50 transition-colors;
+  }
+
+  /* Section labels (the small uppercase tags) */
+  .section-tag {
+    @apply text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
 }
