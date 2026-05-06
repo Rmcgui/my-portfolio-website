@@ -1,6 +1,6 @@
 # webdesignbyryan.com
 
-![Tests](https://github.com/Rmcgui/webdesignbyryan/actions/workflows/playwright.yml/badge.svg)
+![Tests](https://github.com/Rmcgui/my-portfolio-website/actions/workflows/playwright.yml/badge.svg)
 
 The portfolio and business site for **Web Design by Ryan** — a freelance web development practice based in County Mayo, Ireland, building modern websites and custom web applications for businesses across Ireland.
 
