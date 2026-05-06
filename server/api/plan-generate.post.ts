@@ -12,7 +12,7 @@ function toPages(websitePlan: any) {
   const customers = websitePlan?.customers ?? {};
   const contact = websitePlan?.contactUs ?? {};
 
-  // Your UI expects:
+  // UI expects:
   // - pages: [{ id, name, sections: [{ id, type:'hero', title, body, primaryCtaLabel }] }]
   // and SectionsEditor/LivePreview currently handle only `type === 'hero'`,
   // so each page gets a hero section to keep everything editable/previewable.
