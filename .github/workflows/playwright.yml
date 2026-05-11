@@ -28,6 +28,8 @@ jobs:
         env:
           # Day 1 smoke test doesn't need these but the dev server may.
           # Add them now so CI doesn't fail with a cryptic OpenAI init error.
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npx playwright test --project=chromium
 
