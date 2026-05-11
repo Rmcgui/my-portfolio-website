@@ -14,9 +14,9 @@ This repo started as a marketing site (home, about, services, process, projects,
 
 - An AI-powered **website planner** that takes a business profile and generates a draft site structure (homepage copy, pages, sections) using the OpenAI API.
 - **Authenticated user accounts** via Supabase, so visitors can save, list, edit, and delete generated plans.
-- A **Playwright + GitHub Actions** test suite covering smoke flows in CI, with auth and plan-CRUD layers in active development.
+- A **Playwright + GitHub Actions** test suite covering smoke flows and a REST API test layer that exercises the plan-CRUD endpoints end-to-end against a real database, including a cross-user authorisation test that verifies Row-Level Security at the database layer.
 
-The testing layer is being built as part of an application for AutoGuru's Automation Test Engineer role — a deeper write-up will be linked at the bottom once published.
+The testing layer was built as part of an application for AutoGuru's Automation Test Engineer role. A deeper write-up is in [BLOG.md](BLOG.md).
 
 ## Tech stack
 
@@ -49,7 +49,7 @@ Requires Node.js 22+ (required for native WebSocket support that the Supabase re
 # Install dependencies
 npm install
 
-# Create your local env file (see "Environment variables" below)
+# Create a local env file (see "Environment variables" below)
 cp .env.example .env
 
 # Run the dev server on http://localhost:3000
@@ -61,7 +61,7 @@ npm run dev
 ```
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_KEY=eyJ...               # anon public key
-SUPABASE_SERVICE_ROLE_KEY=eyJ...  # server-side only; do not expose to client
+SUPABASE_SERVICE_ROLE_KEY=eyJ...  # server-side only; never expose to client
 OPENAI_API_KEY=sk-...
 ```
 
@@ -70,31 +70,36 @@ Production env vars are configured in the Netlify dashboard. CI env vars are con
 ## Project structure
 
 ```
-app/pages/                # Nuxt pages
-  index.vue               # Marketing home
+app/pages/                  # Nuxt pages
+  index.vue                 # Marketing home
   about.vue, process.vue, projects.vue, contact.vue
-  ai-planner.vue          # AI-powered website planner
+  ai-planner.vue            # AI-powered website planner
   login.vue, signup.vue
   dashboard/
-    index.vue             # User's saved plans
+    index.vue               # Saved plans list
     plans/
-      [id].vue            # Plan edit/delete
+      [id].vue              # Plan edit / delete
 
-app/components/           # Vue components
-app/stores/               # Pinia stores (planner state)
+app/components/             # Vue components
+app/stores/                 # Pinia stores (planner state)
 
 server/api/
-  plan-generate.post.ts   # OpenAI-backed planner endpoint
-  plans/                  # CRUD for saved plans (RLS-protected)
+  plan-generate.post.ts     # OpenAI-backed planner endpoint
+  plans/                    # CRUD for saved plans (RLS-protected)
     index.get.ts, index.post.ts
     [id].get.ts, [id].patch.ts, [id].delete.ts
+server/utils/
+  getAuthedUser.ts          # Dual-auth helper (cookie + Bearer token)
 
 tests/
-  smoke.spec.ts           # Active smoke tests (run in CI)
-  e2e/auth.spec.ts        # Auth E2E suite (currently deferred; see TESTING.md)
-  helpers/auth.ts         # Shared test utilities
+  smoke.spec.ts             # Active smoke tests (run in CI)
+  e2e/auth.spec.ts          # Auth E2E suite (deferred — see TESTING.md)
+  api/plans.spec.ts         # REST API tests against real Supabase
+  helpers/
+    auth.ts                 # E2E auth helpers
+    api.ts                  # API test user provisioning via admin API
 
-docs/acceptance-criteria.md  # User stories with explicit acceptance criteria
+docs/acceptance-criteria.md # User stories with explicit acceptance criteria
 
 nuxt.config.ts
 playwright.config.ts
@@ -113,6 +118,9 @@ npx playwright test --project=chromium
 # Just the smoke tests
 npx playwright test tests/smoke.spec.ts
 
+# Just the API tests
+npx playwright test tests/api/plans.spec.ts
+
 # After a run, open the HTML report
 npx playwright show-report
 ```
@@ -125,7 +133,7 @@ The site auto-deploys to Netlify on push to `main`. Production environment varia
 
 ## Related writing
 
-- Blog post: *Building a Playwright test suite in a week* — coming soon.
+- [BLOG.md](BLOG.md) — *Building a Playwright test suite for an AI-powered web app in seven days.* In-progress write-up of the testing work, including the shift-left workflow, dual-auth helpers, and the cross-user authorisation test.
 
 ## Contact
 

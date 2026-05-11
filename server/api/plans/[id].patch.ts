@@ -1,7 +1,7 @@
-import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { getAuthedUser, getAuthedSupabaseClient } from '~~/server/utils/getAuthedUser'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
+  const user = await getAuthedUser(event)
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthenticated' })
   }
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   if (body?.business_profile !== undefined) updates.business_profile = body.business_profile
   if (body?.pages !== undefined) updates.pages = body.pages
 
-  const supabase = await serverSupabaseClient(event)
+  const supabase = await getAuthedSupabaseClient(event)
   const { data, error } = await supabase
     .from('plans')
     .update(updates)
