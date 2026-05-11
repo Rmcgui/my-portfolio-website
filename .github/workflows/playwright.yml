@@ -24,6 +24,21 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Sanity-check dev server boot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          npm run dev &
+          DEV_PID=$!
+          sleep 60
+          echo "--- After 60s, checking if server is responding ---"
+          curl -v http://localhost:3000 || true
+          echo "--- Killing dev server ---"
+          kill $DEV_PID || true
+        continue-on-error: true
+        
       - name: Run Playwright tests
         env:
           # Day 1 smoke test doesn't need these but the dev server may.
