@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -38,7 +38,7 @@ jobs:
           echo "--- Killing dev server ---"
           kill $DEV_PID || true
         continue-on-error: true
-        
+
       - name: Run Playwright tests
         env:
           # Day 1 smoke test doesn't need these but the dev server may.
