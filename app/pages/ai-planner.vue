@@ -7,8 +7,37 @@ import PagesSidebar from '~/components/planner/PagesSidebar.vue'
 import SectionsEditor from '~/components/planner/SectionsEditor.vue'
 import LivePreview from '~/components/planner/LivePreview.vue'
 
+
 const step = ref(1)
 const planner = usePlannerStore()
+const supabaseUser = useSupabaseUser()
+const router = useRouter()
+const saving = ref(false)
+const saveError = ref('')
+
+const handleSave = async () => {
+  if (!supabaseUser.value) {
+    return router.push('/login?redirect=/ai-planner')
+  }
+  saving.value = true
+  saveError.value = ''
+  try {
+    await $fetch('/api/plans', {
+      method: 'POST',
+      body: {
+        title: planner.plan.businessProfile?.name || 'Untitled plan',
+        industry: planner.plan.businessProfile?.industry ?? null,
+        business_profile: planner.plan.businessProfile,
+        pages: planner.plan.pages,
+      },
+    })
+    await router.push('/dashboard?saved=1')
+  } catch (e) {
+    saveError.value = e?.data?.statusMessage ?? e?.statusMessage ?? 'Failed to save plan'
+  } finally {
+    saving.value = false
+  }
+}
 
 const isGenerating = ref(false)
 
@@ -104,11 +133,11 @@ async function handleSubmitted(profile) {
         </p>
         <IntakeForm
           :is-generating="isGenerating"
-          @submit="handleSubmitted"  
+          @submit="handleSubmitted"
         />
       </div>
       <aside class="bg-white rounded-xl border p-4 text-sm">
-        <h2 class="font-medium mb-2">What you’ll get</h2>
+        <h2 class="font-medium mb-2">What you'll get</h2>
         <ul class="text-xs text-slate-600 space-y-1">
           <li>• Proposed pages & sections</li>
           <li>• Draft text for each section</li>
@@ -202,6 +231,21 @@ async function handleSubmitted(profile) {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Save Plan -->
+      <div class="mt-6 pt-6 border-t">
+        <button
+          type="button"
+          :disabled="saving"
+          @click="handleSave"
+          class="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50 hover:bg-blue-700"
+        >
+          {{ saving ? 'Saving…' : 'Save Plan' }}
+        </button>
+        <p v-if="saveError" class="text-red-600 text-sm mt-2" role="alert">
+          {{ saveError }}
+        </p>
       </div>
     </section>
 

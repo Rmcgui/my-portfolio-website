@@ -1,55 +1,109 @@
-## Deferred tests
-
-The auth test suite in `tests/e2e/auth.spec.ts` is currently marked `test.describe.skip(...)`. The full signup → session → redirect flow works correctly when exercised manually in a browser, but is failing under Playwright's headless automation in a way I haven't yet diagnosed (a timing race between Supabase's auth listener firing and Vue Router's middleware checking `useSupabaseUser()`).
-
-I deliberately deferred this rather than block on it, prioritising the API + GraphQL test layers and the CI pipeline. To be revisited.
-
-**Verified manually:** signup → dashboard, login → dashboard, logout → home, protected route → login redirect with `?redirect=` query param.
-
 # Testing Strategy
 
-This document describes how this project is tested and why.
+This document describes how this project is tested, what's covered automatically, what's verified manually, and what's deferred.
 
 ## Philosophy
 
-Tests are written before features (shift-left). Each user story has acceptance criteria documented in `docs/acceptance-criteria.md` before any test or implementation code is written.
+Each user story has acceptance criteria documented in `docs/acceptance-criteria.md` before any test or implementation code is written. Where automated tests exist, they're written against those criteria and exist to give the feature a regression net, not as an afterthought.
 
-## Test layers
+This is shift-left in intent, with one honest qualification — see "Deferred and out-of-scope" below.
 
-| Layer | Tool | Location | What it covers |
+## Test layers (current state)
+
+| Layer | Tool | Location | Status |
 |---|---|---|---|
-| E2E | Playwright | `tests/e2e/` | User journeys through the browser |
-| API | Playwright (request fixture) | `tests/api/` | REST endpoints, auth, authorisation |
-| GraphQL | Playwright (request fixture) | `tests/graphql/` | GraphQL schema, field selection, errors |
+| Smoke (E2E) | Playwright | `tests/smoke.spec.ts` | Active — runs in CI |
+| Auth (E2E) | Playwright | `tests/e2e/auth.spec.ts` | Deferred — see below |
+| Plan CRUD (E2E and API) | Playwright | — | Not yet written; planned next |
+| GraphQL | Playwright | — | Not yet built; planned next |
 
-## What we mock
+Planned layers (API tests, GraphQL tests) will be added under `tests/api/` and `tests/graphql/` respectively. The directories don't exist yet because the work isn't done.
 
-- **OpenAI:** mocked in all test runs. Hitting the real API would be slow, expensive, and non-deterministic. See `tests/fixtures/openai-mock.ts`.
-- **Supabase:** not mocked. Tests run against a separate Supabase project (`SUPABASE_URL_TEST`) so they exercise real RLS policies and SQL behaviour.
+## What we run against
 
-## What we don't test
+Tests run against a Supabase project shared with development. There's no separate test database at this stage. This is a known limitation:
 
-- Visual regression. Out of scope for this iteration.
-- Email delivery. Auth uses email + password to keep tests fast and deterministic.
+- Test runs that create or modify data touch the same database as manual development
+- A second Supabase project for tests is planned, with credentials injected via GitHub Secrets
+
+## Test environment configuration
+
+The Supabase project has **email confirmation disabled** (Authentication → Sign In / Providers → Email → Confirm email = OFF). This is required because:
+
+- Auth flows need an immediately usable session post-signup; with confirmation on, `auth.signUp()` returns no session and downstream redirects fail
+- Email rate-limiting on the free tier blocks test iteration if confirmations are sent
+
+This is a deliberate trade-off documented for transparency. In a production-equivalent environment, confirmation would be on and the test approach would change (e.g. server-side admin API to create confirmed users for tests).
 
 ## Running tests
 
 ```bash
-npm run test:e2e      # Browser tests
-npm run test:api      # REST API tests
-npm run test:gql      # GraphQL tests
-npm run test          # All of the above
+# Run all tests (Chromium, Firefox, WebKit locally; Chromium-only in CI)
+npx playwright test
+
+# Run just the smoke tests
+npx playwright test tests/smoke.spec.ts
+
+# Run with Chromium only (matches CI)
+npx playwright test --project=chromium
+
+# Open the HTML report after a run
+npx playwright show-report
 ```
 
 ## CI
 
-Tests run on every PR via GitHub Actions. Failed tests block merge. The Playwright HTML report is uploaded as an artifact for failed runs.
+Tests run on every PR via GitHub Actions (`.github/workflows/playwright.yml`). Failed tests block merge. The Playwright HTML report is uploaded as an artifact on every run for inspection.
 
-## Test environment configuration
+CI environment notes:
+- Runs on Node 22 (required for native WebSocket support, which `@supabase/realtime-js` depends on)
+- Supabase credentials and the OpenAI API key are supplied via GitHub Secrets
+- Chromium only — multi-browser is kept local-only to keep CI fast
 
-The Supabase project used for tests has **email confirmation disabled** (Authentication → Providers → Email → Confirm email = OFF). This is required because:
+## Deferred tests
 
-- Tests sign up dozens of users per run; email confirmation rate-limits would block test runs after ~3
-- Tests need an immediately usable session post-signup, which is only available when confirmation is bypassed
+### Auth suite (`tests/e2e/auth.spec.ts`)
 
-In production, email confirmation is ON. Test users therefore exercise a slightly different code path than real users do — this is a deliberate trade-off documented here for transparency.
+All four AUTH describe blocks are marked `test.describe.skip(...)`. The signup → session → redirect flow works correctly when exercised manually in a browser, but fails under Playwright headless automation in a way I haven't yet diagnosed — likely a timing race between Supabase's auth listener firing and Vue Router's middleware checking `useSupabaseUser()`.
+
+Rather than block on this, I deferred the category, documented the deferral here, and moved on to the rest of the test scope. The tests are still in the file, visible, marked as skipped — not silently passing, not deleted.
+
+### Plan CRUD E2E and API tests
+
+Not yet written. The plan CRUD UI was built in Day 3 against acceptance criteria but ahead of test coverage — a deliberate scope decision to prioritise shipping working API surface area for tests to attach to later. To be added under `tests/api/` next.
+
+## Manual verification — auth flows
+
+The deferred auth tests are compensated for by manual verification:
+
+- [x] Signup → `/dashboard` (logged in, email visible in header)
+- [x] Login → `/dashboard`
+- [x] Logout → `/` (session cleared, can't reach `/dashboard`)
+- [x] Protected route → unauthenticated visit to `/dashboard` redirects to `/login`
+- [x] Login error wording does not leak email existence
+
+## Manual verification — plan CRUD
+
+The plan CRUD UI has been manually verified end-to-end. This compensates for the not-yet-written automated tests for these flows.
+
+### Verified
+
+- [x] Unauthenticated user redirected from `/dashboard` to `/login`
+- [x] Authenticated user lands on dashboard with plan list
+- [x] Empty state shows when user has no plans
+- [x] AI planner Step 3 "Save Plan" button saves successfully
+- [x] Saved-toast banner appears on `/dashboard?saved=1` and disappears on subsequent visits
+- [x] New plan appears in dashboard list with title and creation date
+- [x] Clicking a plan loads `/dashboard/plans/[id]` with full data
+- [x] Title edit + save returns user to dashboard with updated title
+- [x] Empty title rejected with inline validation error
+- [x] Delete with confirmation removes plan and redirects to dashboard
+- [x] Delete cancel preserves the plan and clears the confirmation UI
+- [x] Cross-user access to another user's plan UUID returns 404 (Supabase RLS enforcement)
+
+## Out of scope (intentional)
+
+- **Editing individual pages or sections within a plan.** The PATCH endpoint accepts `pages` updates, so a richer editor UI can be added without API changes. Out of scope for this iteration.
+- **Visual regression testing.** No Percy, no Playwright snapshots. Could be added under `tests/visual/` if a customer-facing UI freeze warranted it.
+- **Real OpenAI calls in tests.** Right now plan generation hits the real OpenAI API. Mocking at the `/api/plan-generate` boundary is planned (`tests/fixtures/openai-mock.ts`) to make test runs deterministic and avoid API spend.
+- **Performance/load testing.** Not yet relevant for a single-developer freelance site.
