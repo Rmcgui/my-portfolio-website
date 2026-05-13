@@ -170,6 +170,26 @@ GitHub Actions was running Node 20. Supabase's `realtime-js` library needs WebSo
 
 **Meta-lesson:** when a test suite fails opaquely in CI, the highest-leverage move is usually "add a step that prints what the failing component is actually doing." Cost is negligible; benefit is a diagnosis instead of a guess.
 
+### Day 4, Issue #10 — Writing the test found the bug; running it didn't matter
+
+The goal for this test was to enforce a single acceptance criterion: when AI generation fails, the user sees something. Not a stack trace, not a blank screen — a visible error.
+
+Reviewing the existing handler in `ai-planner.vue` while drafting the test, I found this:
+
+```javascript
+if (error.value) {
+  console.error(error.value)
+  // show toast or message
+  return
+}
+```
+
+The error path was a TODO comment. The test caught the bug before I'd run the test. That's possible because writing the test forced me to read the code from the user's perspective — *what should happen here?* — instead of the developer's — *what does happen here?*
+
+I added a visible error message. Verified manually by setting an invalid `OPENAI_API_KEY` and triggering generation: red alert, clear copy, no silent failure. The test infrastructure to enforce this regression-test-style is in place but currently deferred — `useFetch` runs server-side during hydration in Nuxt 4, which means `page.route()` doesn't intercept the call. Workaround documented in TESTING.md.
+
+The lesson is the broader one about shift-left: tests don't have to *pass* to be valuable. The act of designing the test against a clear acceptance criterion ("the user sees a visible error") forces you to confront whether your code actually does that. Often it doesn't, even when it "works" in the happy path. That's the work that distinguishes a quality engineering culture from a coverage-counting one.
+
 ---
 
 ## The Claude Code experience
