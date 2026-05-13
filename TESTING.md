@@ -117,3 +117,23 @@ The API tests cover the endpoints. These checks cover the UI flows that hit thos
 - **Real OpenAI calls in tests.** Plan generation currently hits the real OpenAI API. Mocking at the `/api/plan-generate` boundary is planned (`tests/fixtures/openai-mock.ts`) to make test runs deterministic and avoid API spend.
 - **Performance and load testing.** Not yet relevant for a single-developer freelance site.
 - **Test-user cleanup.** API tests currently leave their users in `auth.users` (prefixed `apitest-` for easy identification). A `try/finally` cleanup using `deleteTestUser()` from `tests/helpers/api.ts` is straightforward to add when needed.
+
+### Planner failure test (`tests/e2e/planner-failure.spec.ts`)
+
+Marked `test.describe.skip(...)`. The test exists to enforce a real
+acceptance criterion: when `/api/plan-generate` fails, the user must
+see a visible error message. The test infrastructure (OpenAI mocking
+via `page.route()`, the success and failure paths) is in place, but
+running the test against the live planner fails — likely because
+`useFetch` in Nuxt 4 can run server-side during hydration, and
+`page.route()` only intercepts browser-side requests.
+
+The bug the test was designed to discover — that `ai-planner.vue`'s
+error path silently `console.error`'d without showing any UI — was
+fixed in the same commit. `generationError` ref + red alert message
+in step 1 of the planner. Verified manually: setting an invalid
+`OPENAI_API_KEY` produces the failure UI as expected.
+
+To revisit: switch the planner from `useFetch` to `$fetch` (which is
+always client-side) so `page.route()` can intercept, or restructure
+the mock to run as a Nitro server middleware in test mode.

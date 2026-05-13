@@ -82,7 +82,33 @@ const generateSamplePlan = async () => {
   step.value = 2
 }
 
+const generationError = ref('')  // ← add this near the other refs at the top
+
 const generatePlanFromAI = async (profile) => {
+  generationError.value = ''  // ← clear any previous error
+  try {
+    isGenerating.value = true
+    const { data, error } = await useFetch('/api/plan-generate', {
+      method: 'POST',
+      body: { businessProfile: profile },
+      key: `plan-generate-${Date.now()}`,  // ← bust useFetch cache per call
+    })
+
+    if (error.value) {
+      console.error(error.value)
+      generationError.value = 'Something went wrong generating your plan. Please try again.'
+      return
+    }
+
+    planner.setBusinessProfile(profile)
+    planner.setPages(data.value.pages)
+    step.value = 2
+  } finally {
+    isGenerating.value = false
+  }
+}
+
+/* const generatePlanFromAI = async (profile) => {
 
   try{
     isGenerating.value = true
@@ -106,7 +132,7 @@ const generatePlanFromAI = async (profile) => {
   } finally {
     isGenerating.value = false
   }
-}
+} */
 
 async function handleSubmitted(profile) {
   planner.setBusinessProfile(profile)
@@ -130,6 +156,13 @@ async function handleSubmitted(profile) {
         <h1 class="text-2xl font-semibold mb-4">AI Website Planner</h1>
         <p class="text-sm text-slate-600 mb-4">
           Describe your business and goals.
+        </p>
+        <p
+          v-if="generationError"
+          class="text-sm text-red-600 mb-4 p-3 border border-red-200 bg-red-50 rounded"
+          role="alert"
+        >
+          {{ generationError }}
         </p>
         <IntakeForm
           :is-generating="isGenerating"
