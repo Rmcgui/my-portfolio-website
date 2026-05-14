@@ -14,7 +14,7 @@ This repo started as a marketing site (home, about, services, process, projects,
 
 - An AI-powered **website planner** that takes a business profile and generates a draft site structure (homepage copy, pages, sections) using the OpenAI API.
 - **Authenticated user accounts** via Supabase, so visitors can save, list, edit, and delete generated plans.
-- A **Playwright + GitHub Actions** test suite covering smoke flows and a REST API test layer that exercises the plan-CRUD endpoints end-to-end against a real database, including a cross-user authorisation test that verifies Row-Level Security at the database layer.
+- A **Playwright + GitHub Actions** test suite covering smoke flows, a REST API test layer that exercises the plan-CRUD endpoints end-to-end against a real database, and a GraphQL test layer covering auth, field selection, and cross-user authorisation against the same RLS-backed data model.
 
 The testing layer was built as part of an application for AutoGuru's Automation Test Engineer role. A deeper write-up is in [BLOG.md](BLOG.md).
 
@@ -28,6 +28,7 @@ The testing layer was built as part of an application for AutoGuru's Automation 
 
 **Backend / data**
 - Nitro server routes (REST)
+- `graphql-yoga` GraphQL endpoint
 - Supabase (Postgres + auth, Row-Level Security on user-owned tables)
 - OpenAI API for plan generation
 
@@ -84,6 +85,7 @@ app/components/             # Vue components
 app/stores/                 # Pinia stores (planner state)
 
 server/api/
+  graphql.ts                # GraphQL Yoga endpoint
   plan-generate.post.ts     # OpenAI-backed planner endpoint
   plans/                    # CRUD for saved plans (RLS-protected)
     index.get.ts, index.post.ts
@@ -95,6 +97,9 @@ tests/
   smoke.spec.ts             # Active smoke tests (run in CI)
   e2e/auth.spec.ts          # Auth E2E suite (deferred — see TESTING.md)
   api/plans.spec.ts         # REST API tests against real Supabase
+  graphql/plans.spec.ts      # GraphQL auth + RLS coverage
+  e2e/planner-failure.spec.ts # Planner failure-state regression tests
+  fixtures/openai-mock.ts    # Shared OpenAI mock helpers
   helpers/
     auth.ts                 # E2E auth helpers
     api.ts                  # API test user provisioning via admin API
@@ -120,6 +125,12 @@ npx playwright test tests/smoke.spec.ts
 
 # Just the API tests
 npx playwright test tests/api/plans.spec.ts
+
+# Just the GraphQL tests
+npx playwright test tests/graphql/plans.spec.ts
+
+# Just the planner failure tests
+npx playwright test tests/e2e/planner-failure.spec.ts
 
 # After a run, open the HTML report
 npx playwright show-report

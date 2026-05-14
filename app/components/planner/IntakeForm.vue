@@ -124,9 +124,14 @@ const handleSubmit = () => {
     </div>
 
     <div class="flex justify-end gap-2 pt-4">
-      <button type="submit" :disabled="props.isGenerating" class="px-4 py-2 text-sm rounded bg-blue-600 text-white">
-        {{ props.isGenerating ? 'Generating…' : 'Generate Website Plan' }}
-      </button>
+<button
+  type="button"
+  :disabled="props.isGenerating"
+  @click="handleSubmit"
+  class="px-4 py-2 text-sm rounded bg-blue-600 text-white"
+>
+  {{ props.isGenerating ? 'Generating…' : 'Generate Website Plan' }}
+</button>
     </div>
   </form>
 </template>
