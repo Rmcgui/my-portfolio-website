@@ -190,6 +190,7 @@ I added a visible error message. Verified manually by setting an invalid `OPENAI
 
 The lesson is the broader one about shift-left: tests don't have to *pass* to be valuable. The act of designing the test against a clear acceptance criterion ("the user sees a visible error") forces you to confront whether your code actually does that. Often it doesn't, even when it "works" in the happy path. That's the work that distinguishes a quality engineering culture from a coverage-counting one.
 
+
 ### Day 4, Issue #11 — Yoga's error masking, and the choice not to fight it
 
 Writing the "unauthenticated GraphQL request" test, my assertion checked the error message for `/unauthenticated/i`. The test failed against `"Unexpected error."` — Yoga's default response when a resolver throws. This is deliberate: leaking resolver errors to the client can expose internal details (database paths, stack traces, types). Yoga masks them and logs the real message server-side.
@@ -197,6 +198,24 @@ Writing the "unauthenticated GraphQL request" test, my assertion checked the err
 The "correct" fix would be to throw `GraphQLError` with `extensions.code: 'UNAUTHENTICATED'` — this signals "client-safe, deliver as-is" and gives consumers a stable error code to branch on. The pragmatic fix I took was to match `/unexpected error/i` in the test. The test still proves what matters (auth failures don't return data, errors are surfaced in the response envelope), and the masking behaviour is correct for production.
 
 **Lesson:** when a test wants you to fight framework defaults, ask whether the default is wrong or whether the test is wrong. In this case, both were partially right — masking is correct, but the test could be more useful with a typed error. Time pressure picked the simpler path; documenting the trade-off keeps it visible.
+
+### Day 4, Issue #12 — Unskipping the planner-failure test
+
+On Day 2 I'd marked the planner-failure test as `.skip` with a documented hypothesis: `useFetch` was running server-side during hydration, so `page.route()` (which only intercepts browser-side requests) couldn't see the call.
+
+Returning to it on Day 4, I switched `ai-planner.vue` from `useFetch` to `$fetch` — `$fetch` is always client-side, so `page.route()` could now intercept. But the tests still failed.
+
+Three layered bugs surfaced, in order:
+
+1. **Native form submission was bypassing Vue's `@submit.prevent`.** Same headless-mode timing issue I'd hit on Day 2 with the login form. The URL showed a trailing `?` after the click — the giveaway that the form submitted natively before Vue's listener caught it. Fix: change the button to `type="button"` with `@click="handleSubmit"` instead of relying on `type="submit"` + form interception. Same pattern, same fix as the auth pages.
+
+2. **The migration from `useFetch` to `$fetch` was incomplete.** I'd changed the call site but left `data.value.pages` in the success path — `useFetch` wraps the response in a Ref (hence `.value`), but `$fetch` returns the parsed body directly. Console showed `data.value is undefined` and I knew immediately. The lesson here is sharper than the fix: when migrating between two APIs that look similar but return differently-shaped values, the compiler can't help if both expressions are typed as `any`. A test caught what types didn't.
+
+3. **The mock response shape didn't match what the planner store expected.** Less severe — the shape I'd guessed had different field names than what the real `/api/plan-generate` returns. The success test failed because `planner.setPages` was getting unexpected data. Fixed by inspecting the actual API response in DevTools and updating the mock to mirror its shape exactly.
+
+The deeper observation across all three: each bug was caught by a different test failure mode (URL pattern, console error, missing UI). The test infrastructure was robust enough that each bug pointed at itself. That's what good test design buys you — failures that diagnose, not failures that obscure.
+
+The headless form-submission pattern is now a known issue I'd write a lint rule for in a larger codebase. Anywhere `type="submit"` exists with `@submit.prevent`, it's suspect under Playwright. Worth catching at PR-time rather than test-time.
 
 ---
 

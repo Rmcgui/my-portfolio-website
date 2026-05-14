@@ -14,8 +14,14 @@ This is shift-left in intent, with one honest qualification — see "Deferred an
 |---|---|---|---|
 | Smoke (E2E) | Playwright | `tests/smoke.spec.ts` | Active — runs in CI |
 | Auth (E2E) | Playwright | `tests/e2e/auth.spec.ts` | Deferred — see below |
-| Plan CRUD (API) | Playwright `request` fixture | `tests/api/plans.spec.ts` | Active — runs in CI |
-| GraphQL | Playwright | — | Planned; not yet built |
+ Plan CRUD (API) | Playwright `request` fixture | `tests/api/plans.spec.ts` | Active — runs in CI |
+| Planner failure (E2E) | Playwright + `page.route` mock | `tests/e2e/planner-failure.spec.ts` | Active — runs in CI |
+| GraphQL | Playwright `request` fixture | `tests/graphql/plans.spec.ts` | Active — runs in CI |
+
+## What we mock
+
+- **OpenAI:** mocked via `page.route()` interception of `/api/plan-generate` requests. See `tests/fixtures/openai-mock.ts`. The mock fixtures intercept at the application's own endpoint boundary, not at OpenAI's URL — this works because the planner makes its OpenAI calls server-side from the Nitro handler, and the test only needs to control what the browser sees coming back.
+- **Supabase:** not mocked. The auth flow and RLS policies are exercised against the real database. Mocking Supabase would defeat the whole point of the cross-user RLS tests, which prove security at the database layer rather than the resolver layer.
 
 ## What the API tests do
 
@@ -29,6 +35,16 @@ The current four tests cover:
 2. **POST /api/plans returns 400 for missing title.** Authenticated request with invalid body rejected before reaching the database.
 3. **POST /api/plans creates a plan when authenticated.** Happy path — auth, validation, database insert, RLS allowing the row.
 4. **GET /api/plans/:id returns 404 for another user's plan.** Two separate users are provisioned; one cannot read the other's plan even with the UUID. This is the test that proves authorisation works at the database layer, not just the endpoint layer — Supabase RLS policies are doing the protection, and if they regressed, this test would catch it before any user did.
+
+
+### GraphQL tests
+
+The GraphQL suite in `tests/graphql/plans.spec.ts` exercises the Yoga endpoint against the same Supabase-backed data model as the REST tests. The current four tests cover:
+
+1. **Unauthenticated request returns an error response.** Verifies auth failures surface correctly through the GraphQL response envelope.
+2. **Field selection only returns requested fields.** Confirms the resolver layer respects GraphQL's field-selection model instead of over-fetching.
+3. **Cross-user authorisation returns no data for another user's plan.** Same RLS guarantee as the REST suite, exercised through GraphQL.
+4. **Owner can read their own plan.** Positive-path sanity check proving the endpoint returns valid data when auth and ownership are correct.
 
 ## What we run against
 
@@ -58,6 +74,12 @@ npx playwright test tests/smoke.spec.ts
 
 # Run just the API tests
 npx playwright test tests/api/plans.spec.ts
+
+# Run just the GraphQL tests
+npx playwright test tests/graphql/plans.spec.ts
+
+# Run just the planner failure tests
+npx playwright test tests/e2e/planner-failure.spec.ts
 
 # Chromium only (matches CI)
 npx playwright test --project=chromium
@@ -114,26 +136,22 @@ The API tests cover the endpoints. These checks cover the UI flows that hit thos
 
 - **Editing individual pages or sections within a plan.** The PATCH endpoint accepts arbitrary updates to `business_profile` and `pages`, so a richer editor UI can slot in without API changes. Out of scope for this iteration.
 - **Visual regression testing.** No Percy, no Playwright snapshots. Could be added under `tests/visual/` if a customer-facing UI freeze warranted it.
-- **Real OpenAI calls in tests.** Plan generation currently hits the real OpenAI API. Mocking at the `/api/plan-generate` boundary is planned (`tests/fixtures/openai-mock.ts`) to make test runs deterministic and avoid API spend.
+- **OpenAI mocking is now in place at the `/api/plan-generate` boundary.** Shared helpers in `tests/fixtures/openai-mock.ts` make planner tests deterministic and avoid unnecessary API spend in CI while still exercising the planner flow end-to-end from the browser's perspective.
 - **Performance and load testing.** Not yet relevant for a single-developer freelance site.
 - **Test-user cleanup.** API tests currently leave their users in `auth.users` (prefixed `apitest-` for easy identification). A `try/finally` cleanup using `deleteTestUser()` from `tests/helpers/api.ts` is straightforward to add when needed.
 
+## Active regression tests
+
 ### Planner failure test (`tests/e2e/planner-failure.spec.ts`)
 
-Marked `test.describe.skip(...)`. The test exists to enforce a real
-acceptance criterion: when `/api/plan-generate` fails, the user must
-see a visible error message. The test infrastructure (OpenAI mocking
-via `page.route()`, the success and failure paths) is in place, but
-running the test against the live planner fails — likely because
-`useFetch` in Nuxt 4 can run server-side during hydration, and
-`page.route()` only intercepts browser-side requests.
+This suite now runs in CI and exists to enforce a real acceptance criterion: when `/api/plan-generate` fails, the user must see a visible error message.
 
-The bug the test was designed to discover — that `ai-planner.vue`'s
-error path silently `console.error`'d without showing any UI — was
-fixed in the same commit. `generationError` ref + red alert message
-in step 1 of the planner. Verified manually: setting an invalid
-`OPENAI_API_KEY` produces the failure UI as expected.
+Getting the suite green exposed three separate issues layered on top of each other:
 
-To revisit: switch the planner from `useFetch` to `$fetch` (which is
-always client-side) so `page.route()` can intercept, or restructure
-the mock to run as a Nitro server middleware in test mode.
+1. **`useFetch` server-side execution bypassed `page.route()`.** The original planner implementation used `useFetch`, which can execute during Nuxt hydration. Playwright's `page.route()` only intercepts browser-side requests, so the mock never fired. Switching the planner call to `$fetch` ensured the request stayed client-side and interceptable.
+2. **Native form submission bypassed Vue's `@submit.prevent` under headless mode.** In automation, the form occasionally submitted natively before Vue finished wiring the listener, causing full-page navigations and inconsistent failures.
+3. **Incomplete `data.value` → `data` migration after the `$fetch` switch.** One lingering `.value` access caused the mocked success path to fail despite the network layer being fixed.
+
+The original issue was real: the planner error path only logged to `console.error` and showed nothing in the UI. The test now enforces the visible failure state, backed by shared mocks in `tests/fixtures/openai-mock.ts`.
+
+Historical note: this suite originally lived under "Deferred tests" because the infrastructure wasn't stable enough to run reliably. Closing that loop — getting the test genuinely running instead of merely written — turned out to matter more than expected.

@@ -88,21 +88,21 @@ const generatePlanFromAI = async (profile) => {
   generationError.value = ''  // ← clear any previous error
   try {
     isGenerating.value = true
-    const { data, error } = await useFetch('/api/plan-generate', {
+    const data = await $fetch('/api/plan-generate', {
       method: 'POST',
       body: { businessProfile: profile },
-      key: `plan-generate-${Date.now()}`,  // ← bust useFetch cache per call
     })
 
-    if (error.value) {
-      console.error(error.value)
-      generationError.value = 'Something went wrong generating your plan. Please try again.'
-      return
-    }
+    console.log('[PLANNER] received data:', JSON.stringify(data, null, 2)) 
+
+    console.log('API Data: ', data)
 
     planner.setBusinessProfile(profile)
-    planner.setPages(data.value.pages)
+    planner.setPages(data.pages)
     step.value = 2
+  } catch (e) {
+    console.error(e)
+    generationError.value = 'Something went wrong generating your plan. Please try again.'
   } finally {
     isGenerating.value = false
   }

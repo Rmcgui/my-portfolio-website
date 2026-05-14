@@ -2,9 +2,10 @@ import { test, expect } from '@playwright/test'
 import { mockOpenAIFailure, mockOpenAISuccess } from '../fixtures/openai-mock'
 
 test.describe('AI Planner: graceful failure handling', () => {
-  test.skip('shows a user-visible error when AI generation fails', async ({ page }) => {
+  test('shows a user-visible error when AI generation fails', async ({ page }) => {
     await mockOpenAIFailure(page)
     await page.goto('/ai-planner')
+    await page.waitForLoadState('networkidle')         
 
     await page.getByLabel(/business name/i).fill('Test Café')
     await page.getByLabel(/describe your business/i).fill('A small test café in Mayo.')
@@ -15,9 +16,10 @@ test.describe('AI Planner: graceful failure handling', () => {
     ).toBeVisible({ timeout: 10_000 })
   })
 
-  test.skip('proceeds to plan step when AI generation succeeds', async ({ page }) => {
+  test('proceeds to plan step when AI generation succeeds', async ({ page }) => {
     await mockOpenAISuccess(page)
     await page.goto('/ai-planner')
+    await page.waitForLoadState('networkidle')           
 
     await page.getByLabel(/business name/i).fill('Test Café')
     await page.getByLabel(/describe your business/i).fill('A small test café in Mayo.')
