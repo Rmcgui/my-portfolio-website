@@ -102,3 +102,79 @@
 - Clicking it shows a confirmation prompt.
 - Confirming deletes the plan and redirects to the dashboard, where it no longer appears.
 - Cancelling closes the prompt; the plan remains.
+
+## GRAPHQL-001: Unauthenticated GraphQL request returns an error
+
+**As the** application
+**I want to** reject GraphQL queries from unauthenticated callers
+**So that** no plan data is readable without a valid session.
+
+### Criteria
+
+- A `POST /api/graphql` request with no `Authorization` header and the `myPlans` query returns HTTP 200 (GraphQL spec — errors are in the body, not the status code).
+- The response body contains an `errors` array with at least one entry.
+- The response body does not contain a `data.myPlans` value.
+
+## GRAPHQL-002: Field selection returns only requested fields
+
+**As a** GraphQL consumer
+**I want to** request a subset of plan fields
+**So that** the API honours field selection and does not over-fetch.
+
+### Criteria
+
+- An authenticated `myPlans` query requesting only `id` and `title` returns plans where each object has exactly those two keys.
+- Fields not requested (e.g. `industry`, `createdAt`) are absent from the response — not null, not present.
+- The response body contains no `errors`.
+
+## GRAPHQL-003: Cross-user query returns null
+
+**As the** application
+**I want to** prevent one user from reading another user's plan via GraphQL
+**So that** the GraphQL layer has the same ownership enforcement as the REST layer.
+
+### Criteria
+
+- User A creates a plan.
+- User B (a different authenticated user), knowing User A's plan UUID, sends a `plan(id: $id)` query.
+- The response returns HTTP 200 with `data.plan: null` — not a 404, not an `errors` entry.
+- The null result is produced by Postgres RLS refusing to return the row; the GraphQL resolver does not need its own ownership check.
+
+## GRAPHQL-004: Owner can read their own plan via GraphQL
+
+**As a** logged-in user
+**I want to** query my own plan by ID via GraphQL
+**So that** the GraphQL API is usable, not just correctly secured.
+
+### Criteria
+
+- An authenticated user creates a plan, then queries it by ID with `plan(id: $id)`.
+- The response returns the plan's `id`, `title`, and `industry` matching what was created.
+- The response body contains no `errors`.
+
+---
+
+## MOCK-001: AI generation failure shows a visible user error
+
+**As a** user
+**I want to** see a clear error message when AI plan generation fails
+**So that** I know something went wrong and can try again — not a blank screen or silent failure.
+
+### Criteria
+
+- When `/api/plan-generate` returns a 500 (or any non-OK response), the intake form page displays a visible, non-empty error message.
+- The error text matches at least one of: "something went wrong", "try again", "unavailable", "error" (case-insensitive).
+- The error is visible without any user interaction after the Generate button is clicked.
+- The form remains on step 1; the app does not advance to the plan editing step.
+
+## MOCK-002: AI generation success advances to plan editing step
+
+**As a** user
+**I want to** be taken to the plan editing view after AI generation succeeds
+**So that** I can review and modify the generated plan.
+
+### Criteria
+
+- When `/api/plan-generate` returns a valid plan response, the app navigates to step 2.
+- The "Edit Website Plan" heading is visible.
+- No error message is shown.

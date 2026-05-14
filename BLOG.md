@@ -1,32 +1,38 @@
-# Building a Playwright Test Suite for an AI-Powered Web App in Seven Days
+# Building a Playwright Test Suite for an AI-Powered Web App in Four Days
 
-> **Status:** Working draft. The narrative reflects work completed through Day 3 of a planned seven-day push. Final polish + screenshots before publication.
+> **Status:** Working draft. Final polish + screenshots before publication.
 
-AutoGuru is hiring an Automation Test Engineer. Their stack is Playwright, GraphQL, and AI tooling like Claude Code, and their job description spells out a culture I want to work in: quality engineers embedded with developers, no flaky tests, shift-left as a default rather than a slogan. I'm a full-stack developer, not a career tester — so rather than apply on the strength of a CV alone, I gave myself a week to put their stack into practice on my own product. This post is what I built, what worked, and what I'd do differently.
+AutoGuru is hiring an Automation Test Engineer. Their stack is Playwright, GraphQL, and AI tooling like Claude Code, and their job description spells out a culture I want to work in: quality engineers embedded with developers, no flaky tests, shift-left as a default rather than a slogan. I'm a full-stack developer, not a career tester — so rather than apply on the strength of a CV alone, I gave myself four days to put their stack into practice on my own product. This post is what I built, what worked, and what I'd do differently.
 
 ---
 
 ## The brief
 
-<!-- TODO Day 7: tighten this section to ~200 words. Mention:
-- The existing site (webdesignbyryan.com, Nuxt 4, Vue 3, Tailwind)
-- The existing AI feature (the website planner — calls OpenAI, generates page-by-page plan)
-- Why I chose to add tests around an existing AI feature rather than spin up a fresh project: closer to AutoGuru's actual situation (testing live product features, not greenfield)
-- The seven-day constraint and why it mattered (forced honest scope decisions)
--->
+The existing site is [webdesignbyryan.com](https://webdesignbyryan.com) — a Nuxt 4 / Vue 3 / Tailwind marketing and portfolio site. Its main feature is the AI website planner: a business owner fills in a multi-step form (name, industry, description, goals, tone), the server calls OpenAI, and the response comes back as a structured page-by-page website plan the user can edit and save to their account.
+
+Rather than spin up a fresh project for this exercise, I chose to build tests around that existing feature. The reasoning: AutoGuru's engineers work with live product features, not greenfield demos. A suite against a working system has to deal with real state, third-party API costs, SSR/client hydration boundaries, and the gaps between what code does and what it was supposed to do. Those are the interesting problems.
+
+The constraint I set: four days. Day 1 — smoke tests and Playwright setup. Day 2 — auth tests. Day 3 — REST API tests and plan CRUD. Day 4 — GraphQL, OpenAI mocking, and the AI planner failure path. Tight enough to force honest scope decisions, long enough to demonstrate depth in each layer. The scope that didn't make it — visual regression, load testing, full E2E auth resolution — is documented honestly in "What I'd do with more time."
 
 ---
 
 ## The architecture
 
-<!-- TODO Day 7: ~300 words. Cover:
-- Existing: Nuxt 4 (app/ directory), Vue 3 + Composition API, Tailwind, Pinia, OpenAI SDK, Netlify hosting
-- Added for testing: Supabase (auth + Postgres + RLS), Playwright, GitHub Actions
-- Two active test layers: smoke (E2E) and REST API tests against real Supabase
-- Why I added auth/CRUD around the planner instead of testing it standalone: gave me realistic surface area — protected routes, cross-user authorisation, mocked external APIs
-- Defer-and-document approach for the deferred auth E2E suite
-- One diagram if I have time (just a box-and-arrow of how requests flow)
--->
+The existing stack at webdesignbyryan.com: Nuxt 4 (`app/` directory), Vue 3 Composition API, Tailwind CSS, Pinia for state management, the OpenAI Node SDK on the server side, deployed to Netlify.
+
+To give the test suite realistic surface area — protected routes, cross-user data, a mocked external API — I added three layers:
+
+**Supabase** handles auth (email/password, cookie-based for browsers), a Postgres database for storing plans, and Row-Level Security. The RLS policy (`using (auth.uid() = user_id)`) means the database itself enforces ownership; no application code can leak another user's plan even if it has a bug. Verifying that defence-in-depth is only possible by testing against a real database, which is why Supabase is never mocked.
+
+**GitHub Actions** runs the full suite on every push, using a real Nuxt dev server rather than a mock environment. The real-world config took two attempts — local Node 22 hid a WebSocket incompatibility that only surfaced in CI on Node 20 (Issue #9).
+
+**Playwright** covers four test layers:
+- **Smoke** (`tests/smoke.spec.ts`): one test, site loads and title matches. The canary.
+- **E2E** (`tests/e2e/`): browser-driven user journeys with `page.route()` for network mocking. Auth flows are deferred and documented in TESTING.md; the AI planner failure and success paths are active.
+- **REST API** (`tests/api/plans.spec.ts`): HTTP-level tests via Playwright's `request` fixture, no browser. Supabase admin API provisions isolated test users per test run.
+- **GraphQL** (`tests/graphql/plans.spec.ts`): same Bearer-token auth as REST, proving field selection and cross-user RLS hold at the GraphQL layer too.
+
+A shared utility (`server/utils/getAuthedUser.ts`) handles dual-mode auth: cookies for browsers, Bearer tokens for API clients. OpenAI calls are mocked at the network boundary using `page.route()` — fast, free of API spend in CI, and only possible because the AI planner uses `$fetch` (client-side) rather than `useFetch` (SSR-side, where `page.route()` can't intercept).
 
 ---
 
@@ -186,7 +192,7 @@ if (error.value) {
 
 The error path was a TODO comment. The test caught the bug before I'd run the test. That's possible because writing the test forced me to read the code from the user's perspective — *what should happen here?* — instead of the developer's — *what does happen here?*
 
-I added a visible error message. Verified manually by setting an invalid `OPENAI_API_KEY` and triggering generation: red alert, clear copy, no silent failure. The test infrastructure to enforce this regression-test-style is in place but currently deferred — `useFetch` runs server-side during hydration in Nuxt 4, which means `page.route()` doesn't intercept the call. Workaround documented in TESTING.md.
+I added a visible error message. Verified manually by setting an invalid `OPENAI_API_KEY` and triggering generation: red alert, clear copy, no silent failure. The test infrastructure to enforce this is active in `tests/e2e/planner-failure.spec.ts`. Getting there took one more step: the original implementation used `useFetch`, which runs server-side during SSR hydration — meaning `page.route()` couldn't intercept the request to `/api/plan-generate`. Migrating to `$fetch` (client-side) fixed the interception, and both the failure and success paths now run in CI.
 
 The lesson is the broader one about shift-left: tests don't have to *pass* to be valuable. The act of designing the test against a clear acceptance criterion ("the user sees a visible error") forces you to confront whether your code actually does that. Often it doesn't, even when it "works" in the happy path. That's the work that distinguishes a quality engineering culture from a coverage-counting one.
 
@@ -253,9 +259,7 @@ A subset of these will land in the final version. Listed here while the week is 
 ## What I'd do with more time
 
 - **Cross-user authorisation tests for every endpoint, not just GET.** PATCH and DELETE deserve the same treatment. Easy to add now that the helper exists.
-- **Mock OpenAI at the `/api/plan-generate` boundary** to make plan-generation tests deterministic and avoid API spend in CI.
 - **Visual regression with Playwright snapshots** for the marketing pages — Tailwind regressions are otherwise invisible.
-- **A GraphQL endpoint** for read-only plan browsing, with its own test suite covering field selection and error handling. Originally planned for Day 5; deferred.
 - **BDD with Cucumber/Gherkin** if the team prefers human-readable specs. The acceptance criteria are already in plain English; a thin Gherkin wrapper would let non-engineers read the test suite.
 - **Performance/load testing with k6** against the API endpoints. Not yet relevant for this product but a useful skill to demonstrate.
 - **Mutation testing with Stryker** to verify test quality, not just coverage. Currently the test suite has no measure of how good its assertions are; mutation testing fills that gap.
