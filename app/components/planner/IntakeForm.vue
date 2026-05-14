@@ -12,11 +12,11 @@ const emit = defineEmits<{
 
 
 const form = reactive<BusinessProfile>({
-  name: 'Sky Barbers',
-  location: 'Castlebar, Co. Mayo',  
-  industry: 'Hair and Beauty',
-  description: 'Sky Barbers is a family-run barber shop that has been operating for 20 years.The business serves the local community and has built long-term relationships with customers.Services are provided by experienced barbers with a focus on quality and consistency.The shop offers grooming services for men and boys of all ages.Emphasis is placed on customer service, reliability, and a welcoming atmosphere.',
-  customers: 'Local residents. Men and boys of all ages. Families looking for a reliable, long-established barber. Customers who value consistency and personal service',
+  name: '',
+  location: '',  
+  industry: '',
+  description: '',
+  customers: '',
   tone: 'friendly',
   brandKeywords: [],
   websiteGoals: [],
