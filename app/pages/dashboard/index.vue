@@ -7,7 +7,25 @@ const route = useRoute()
 const showSavedToast = ref(route.query.saved === '1')
 
 // Fetch the user's plans
-const { data: plans, refresh } = await useFetch('/api/plans', {
+/* const { data: plans, refresh } = await useFetch('/api/plans', {
+  default: () => [],
+}) */
+const { data: plans } = await useFetch('/api/graphql', {
+  method: 'POST',
+  body: {
+    query: `
+      query DashboardPlans {
+        myPlans {
+          id
+          title
+          industry
+          createdAt
+        }
+      }
+    `,
+  },
+  // Extract the plans array out of the GraphQL response envelope
+  transform: (res: any) => res?.data?.myPlans ?? [],
   default: () => [],
 })
 
@@ -75,7 +93,7 @@ const formatDate = (iso: string) => {
               </div>
             </div>
             <div class="text-xs text-gray-500">
-              {{ formatDate(plan.created_at) }}
+              {{ formatDate(plan.createdAt) }}
             </div>
           </div>
         </NuxtLink>
