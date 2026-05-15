@@ -55,7 +55,9 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/confirm',
       // Public routes — everything else requires auth
-      exclude: ['/', '/about', '/process', '/projects', '/contact', '/ai-planner', '/signup', '/login', '/blog', '/blog/**'],
+      // All protected routes are handled by auth.global.ts (which appends ?redirect=).
+      // Exclude everything here so the module's built-in middleware doesn't race with ours.
+      exclude: ['/**'],
     },
   },
 })
