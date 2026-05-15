@@ -1,7 +1,5 @@
 # Building a Playwright Test Suite for an AI-Powered Web App in Four Days
 
-> **Status:** Working draft. Final polish + screenshots before publication.
-
 AutoGuru is hiring an Automation Test Engineer. Their stack is Playwright, GraphQL, and AI tooling like Claude Code, and their job description spells out a culture I want to work in: quality engineers embedded with developers, no flaky tests, shift-left as a default rather than a slogan. I'm a full-stack developer, not a career tester — so rather than apply on the strength of a CV alone, I gave myself four days to put their stack into practice on my own product. This post is what I built, what worked, and what I'd do differently.
 
 ---
@@ -221,14 +219,9 @@ Three layered bugs surfaced, in order:
 
 The deeper observation across all three: each bug was caught by a different test failure mode (URL pattern, console error, missing UI). The test infrastructure was robust enough that each bug pointed at itself. That's what good test design buys you - failures that diagnose, not failures that obscure.
 
-The headless form-submission pattern is now a known issue I'd write a lint rule for in a larger codebase. Anywhere `type="submit"` exists with `@submit.prevent`, it's suspect under Playwright. Worth catching at PR-time rather than test-time.
+The headless form-submission pattern is now a known issue I'd write a lint rule for in a larger codebase. Anywhere `type="submit"` exists with `@submit.prevent`, it's suspect under Playwright. Worth catching at PR-time rather than test-time. 
 
----
-
-## The Claude Code experience
-
-<!-- TODO Day 7: ~400 words. Pull from claude-code-notes.md.
-
+<!-- TODO Day 7: ~400 words. Pull from claude-code-notes.md. The Claude Code experience
 Structure:
 - What worked first time (probably: test scaffolding, helper extraction, regex-heavy assertions, auth utility refactor)
 - What didn't (probably: selector guesses based on assumed labels, race conditions in async tests, multi-hour deep dives where the AI proposes fixes without enough diagnostic data)
@@ -239,9 +232,7 @@ Structure:
 
 The honest signal AutoGuru wants: someone who's used the tool enough to have nuanced opinions about it, not someone who's read the marketing.
 -->
-
 ---
-
 ## Lessons
 
 A subset of these will land in the final version. Listed here while the week is fresh:
