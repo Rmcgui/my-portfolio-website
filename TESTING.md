@@ -13,15 +13,10 @@ This is shift-left in intent, with one honest qualification — see "Deferred an
 | Layer | Tool | Location | Status |
 |---|---|---|---|
 | Smoke (E2E) | Playwright | `tests/smoke.spec.ts` | Active — runs in CI |
-| Auth (E2E) | Playwright | `tests/e2e/auth.spec.ts` | Deferred — see below |
- Plan CRUD (API) | Playwright `request` fixture | `tests/api/plans.spec.ts` | Active — runs in CI |
-| Planner failure (E2E) | Playwright + `page.route` mock | `tests/e2e/planner-failure.spec.ts` | Active — runs in CI |
+| Auth (E2E) | Playwright | `tests/e2e/auth.spec.ts` | Active — Chromium/Firefox pass; WebKit known issue (see below) |
+| Plan CRUD (API) | Playwright `request` fixture | `tests/api/plans.spec.ts` | Active — runs in CI |
 | GraphQL | Playwright `request` fixture | `tests/graphql/plans.spec.ts` | Active — runs in CI |
-
-## What we mock
-
-- **OpenAI:** mocked via `page.route()` interception of `/api/plan-generate` requests. See `tests/fixtures/openai-mock.ts`. The mock fixtures intercept at the application's own endpoint boundary, not at OpenAI's URL — this works because the planner makes its OpenAI calls server-side from the Nitro handler, and the test only needs to control what the browser sees coming back.
-- **Supabase:** not mocked. The auth flow and RLS policies are exercised against the real database. Mocking Supabase would defeat the whole point of the cross-user RLS tests, which prove security at the database layer rather than the resolver layer.
+| Planner failure (E2E) | Playwright | `tests/e2e/planner-failure.spec.ts` | Active — runs in CI |
 
 ## What the API tests do
 
@@ -35,16 +30,6 @@ The current four tests cover:
 2. **POST /api/plans returns 400 for missing title.** Authenticated request with invalid body rejected before reaching the database.
 3. **POST /api/plans creates a plan when authenticated.** Happy path — auth, validation, database insert, RLS allowing the row.
 4. **GET /api/plans/:id returns 404 for another user's plan.** Two separate users are provisioned; one cannot read the other's plan even with the UUID. This is the test that proves authorisation works at the database layer, not just the endpoint layer — Supabase RLS policies are doing the protection, and if they regressed, this test would catch it before any user did.
-
-
-### GraphQL tests
-
-The GraphQL suite in `tests/graphql/plans.spec.ts` exercises the Yoga endpoint against the same Supabase-backed data model as the REST tests. The current four tests cover:
-
-1. **Unauthenticated request returns an error response.** Verifies auth failures surface correctly through the GraphQL response envelope.
-2. **Field selection only returns requested fields.** Confirms the resolver layer respects GraphQL's field-selection model instead of over-fetching.
-3. **Cross-user authorisation returns no data for another user's plan.** Same RLS guarantee as the REST suite, exercised through GraphQL.
-4. **Owner can read their own plan.** Positive-path sanity check proving the endpoint returns valid data when auth and ownership are correct.
 
 ## What we run against
 
@@ -75,12 +60,6 @@ npx playwright test tests/smoke.spec.ts
 # Run just the API tests
 npx playwright test tests/api/plans.spec.ts
 
-# Run just the GraphQL tests
-npx playwright test tests/graphql/plans.spec.ts
-
-# Run just the planner failure tests
-npx playwright test tests/e2e/planner-failure.spec.ts
-
 # Chromium only (matches CI)
 npx playwright test --project=chromium
 
@@ -97,13 +76,18 @@ CI environment notes:
 - Supabase credentials (`SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) and the OpenAI API key are supplied via GitHub Secrets.
 - Chromium only — multi-browser is kept local-only to keep CI fast.
 
-## Deferred tests
+## Known limitation: WebKit auth under parallel load
 
-### Auth suite (`tests/e2e/auth.spec.ts`)
+All four AUTH describes pass on Chromium and Firefox. Under WebKit, six tests fail when the suite is run with multiple parallel workers. The symptom in every case: the browser stays on `/signup` or `/login` after a successful Supabase `signUp` or `signInWithPassword` call — the session is created (no error returned) but the post-auth redirect never fires.
 
-All four AUTH describe blocks are marked `test.describe.skip(...)`. The signup → session → redirect flow works correctly when exercised manually in a browser, but fails under Playwright headless automation in a way I haven't yet diagnosed — likely a timing race between Supabase's auth listener firing and Vue Router's middleware checking `useSupabaseUser()`.
+**Root cause hypothesis:** WebKit enforces stricter cookie policies (ITP — Intelligent Tracking Prevention) and may reject cookies with `SameSite=None; Secure` attributes when the origin is plain HTTP (`localhost`). Supabase auth cookies set this way would be silently dropped, leaving `useSupabaseUser()` returning `null` despite a valid session, and the redirect guard never seeing an authenticated user.
 
-Rather than block on this, I deferred the category, documented the deferral here, and moved on to the rest of the test scope. The tests are still in the file, visible, marked as skipped — not silently passing, not deleted. The auth flows are exercised in practice every time an API test calls `createTestUser()`, which validates the same Supabase auth surface from a different angle.
+**Why it only appears under parallel load:** when WebKit workers run concurrently against the same dev server, there may be additional storage-isolation behaviour in Playwright's WebKit engine that isn't present when a single test runs in isolation.
+
+**Workarounds under investigation:**
+- Run Playwright's WebKit project over HTTPS (requires a local TLS cert and `baseURL: 'https://localhost:3000'`)
+- Configure Supabase to use `localStorage` instead of cookies for session storage in the test environment (`storage: { getItem, setItem, removeItem }` passed to `createClient`)
+- Mark the WebKit project as optional in CI until resolved
 
 ## Manual verification — auth flows
 
@@ -136,22 +120,7 @@ The API tests cover the endpoints. These checks cover the UI flows that hit thos
 
 - **Editing individual pages or sections within a plan.** The PATCH endpoint accepts arbitrary updates to `business_profile` and `pages`, so a richer editor UI can slot in without API changes. Out of scope for this iteration.
 - **Visual regression testing.** No Percy, no Playwright snapshots. Could be added under `tests/visual/` if a customer-facing UI freeze warranted it.
-- **OpenAI mocking is now in place at the `/api/plan-generate` boundary.** Shared helpers in `tests/fixtures/openai-mock.ts` make planner tests deterministic and avoid unnecessary API spend in CI while still exercising the planner flow end-to-end from the browser's perspective.
+- **Real OpenAI calls in non-mocked contexts.** The planner failure/success E2E tests mock at the `/api/plan-generate` boundary using `page.route()` via `tests/fixtures/openai-mock.ts`. Direct API tests that provision plans via REST use `POST /api/plans` (which skips generation entirely). No test currently calls the real OpenAI API.
 - **Performance and load testing.** Not yet relevant for a single-developer freelance site.
 - **Test-user cleanup.** API tests currently leave their users in `auth.users` (prefixed `apitest-` for easy identification). A `try/finally` cleanup using `deleteTestUser()` from `tests/helpers/api.ts` is straightforward to add when needed.
 
-## Active regression tests
-
-### Planner failure test (`tests/e2e/planner-failure.spec.ts`)
-
-This suite now runs in CI and exists to enforce a real acceptance criterion: when `/api/plan-generate` fails, the user must see a visible error message.
-
-Getting the suite green exposed three separate issues layered on top of each other:
-
-1. **`useFetch` server-side execution bypassed `page.route()`.** The original planner implementation used `useFetch`, which can execute during Nuxt hydration. Playwright's `page.route()` only intercepts browser-side requests, so the mock never fired. Switching the planner call to `$fetch` ensured the request stayed client-side and interceptable.
-2. **Native form submission bypassed Vue's `@submit.prevent` under headless mode.** In automation, the form occasionally submitted natively before Vue finished wiring the listener, causing full-page navigations and inconsistent failures.
-3. **Incomplete `data.value` → `data` migration after the `$fetch` switch.** One lingering `.value` access caused the mocked success path to fail despite the network layer being fixed.
-
-The original issue was real: the planner error path only logged to `console.error` and showed nothing in the UI. The test now enforces the visible failure state, backed by shared mocks in `tests/fixtures/openai-mock.ts`.
-
-Historical note: this suite originally lived under "Deferred tests" because the infrastructure wasn't stable enough to run reliably. Closing that loop — getting the test genuinely running instead of merely written — turned out to matter more than expected.

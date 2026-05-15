@@ -1,7 +1,5 @@
 # Building a Playwright Test Suite for an AI-Powered Web App in Four Days
 
-> **Status:** Working draft. Final polish + screenshots before publication.
-
 AutoGuru is hiring an Automation Test Engineer. Their stack is Playwright, GraphQL, and AI tooling like Claude Code, and their job description spells out a culture I want to work in: quality engineers embedded with developers, no flaky tests, shift-left as a default rather than a slogan. I'm a full-stack developer, not a career tester — so rather than apply on the strength of a CV alone, I gave myself four days to put their stack into practice on my own product. This post is what I built, what worked, and what I'd do differently.
 
 ---
@@ -12,7 +10,7 @@ The existing site is [webdesignbyryan.com](https://webdesignbyryan.com) — a Nu
 
 Rather than spin up a fresh project for this exercise, I chose to build tests around that existing feature. The reasoning: AutoGuru's engineers work with live product features, not greenfield demos. A suite against a working system has to deal with real state, third-party API costs, SSR/client hydration boundaries, and the gaps between what code does and what it was supposed to do. Those are the interesting problems.
 
-The constraint I set: four days. Day 1 — smoke tests and Playwright setup. Day 2 — auth tests. Day 3 — REST API tests and plan CRUD. Day 4 — GraphQL, OpenAI mocking, and the AI planner failure path. Tight enough to force honest scope decisions, long enough to demonstrate depth in each layer. The scope that didn't make it: visual regression, load testing, full E2E auth resolution is documented honestly in "What I'd do with more time."
+The constraint I set: four days. Day 1 — smoke tests and Playwright setup. Day 2 — auth tests. Day 3 — REST API tests and plan CRUD. Day 4 — GraphQL, OpenAI mocking, and the AI planner failure path. Tight enough to force honest scope decisions, long enough to demonstrate depth in each layer. The scope that didn't make it — visual regression, load testing, WebKit auth compatibility under parallel execution — is documented honestly in "What I'd do with more time."
 
 ---
 
@@ -20,15 +18,15 @@ The constraint I set: four days. Day 1 — smoke tests and Playwright setup. Day
 
 The existing stack at webdesignbyryan.com: Nuxt 4 (`app/` directory), Vue 3 Composition API, Tailwind CSS, Pinia for state management, the OpenAI Node SDK on the server side, deployed to Netlify.
 
-To give the test suite realistic surface area — protected routes, cross-user data, a mocked external API, I added three layers:
+To give the test suite realistic surface area — protected routes, cross-user data, a mocked external API — I added three layers:
 
 **Supabase** handles auth (email/password, cookie-based for browsers), a Postgres database for storing plans, and Row-Level Security. The RLS policy (`using (auth.uid() = user_id)`) means the database itself enforces ownership; no application code can leak another user's plan even if it has a bug. Verifying that defence-in-depth is only possible by testing against a real database, which is why Supabase is never mocked.
 
-**GitHub Actions** runs the full suite on every push, using a real Nuxt dev server rather than a mock environment. The real-world config took two attempts - local Node 22 hid a WebSocket incompatibility that only surfaced in CI on Node 20 (Issue #9).
+**GitHub Actions** runs the full suite on every push, using a real Nuxt dev server rather than a mock environment. The real-world config took two attempts — local Node 22 hid a WebSocket incompatibility that only surfaced in CI on Node 20 (Issue #9).
 
 **Playwright** covers four test layers:
 - **Smoke** (`tests/smoke.spec.ts`): one test, site loads and title matches. The canary.
-- **E2E** (`tests/e2e/`): browser-driven user journeys with `page.route()` for network mocking. Auth flows are deferred and documented in TESTING.md; the AI planner failure and success paths are active.
+- **E2E** (`tests/e2e/`): browser-driven user journeys with `page.route()` for network mocking. Auth flows (AUTH-001 through AUTH-004) are active and passing on Chromium and Firefox. The AI planner failure and success paths are also active.
 - **REST API** (`tests/api/plans.spec.ts`): HTTP-level tests via Playwright's `request` fixture, no browser. Supabase admin API provisions isolated test users per test run.
 - **GraphQL** (`tests/graphql/plans.spec.ts`): same Bearer-token auth as REST, proving field selection and cross-user RLS hold at the GraphQL layer too.
 
@@ -48,7 +46,7 @@ In a normal "test after" workflow most of the issues below would have been invis
 
 **What I tried first:** assumed the config was filtering them out. Searched for `grep`, `testIgnore`, broken `testDir` paths. All clean.
 
-**Actual cause:** Nuxt's dev server couldn't bind to port 3000 as something else on my Mac was holding it and it silently fell back to 3003. Playwright's `webServer` config was waiting for `localhost:3000`, never got a response, timed out after 120s, and emitted an empty report. The "no tests" output was correct from Playwright's perspective; the suite literally never ran.
+**Actual cause:** Nuxt's dev server couldn't bind to port 3000 — something else on my Mac was holding it — and it silently fell back to 3003. Playwright's `webServer` config was waiting for `localhost:3000`, never got a response, timed out after 120s, and emitted an empty report. The "no tests" output was correct from Playwright's perspective; the suite literally never ran.
 
 **Fix:** `lsof -i :3000` to find the squatter, killed it, server bound to 3000, tests ran.
 
@@ -60,35 +58,37 @@ In a normal "test after" workflow most of the issues below would have been invis
 
 **Actual cause:** The plan I worked from guessed at the title. The real SEO copy is more search-optimised.
 
-**Fix:** Changed the assertion to `/Ryan McGuire/i` which is the most stable substring.
+**Fix:** Changed the assertion to `/Ryan McGuire/i` — the most stable substring.
 
-**Lesson:** trivially small, but illustrative. The test caught a mismatch between assumption and reality in five seconds. Without the test it would have stayed unnoticed indefinitely as page titles aren't something I manually verify.
+**Lesson:** trivially small, but illustrative. The test caught a mismatch between assumption and reality in five seconds. Without the test it would have stayed unnoticed indefinitely — page titles aren't something I manually verify.
 
 ### Day 2, Issue #3 — The Supabase redirect-loop nobody mentioned
 
-**Symptom:** Every auth test that called `page.goto('/signup')` ended up on `/login` instead. The Playwright trace showed the navigation completing but to the wrong URL. The "Email" and "Password" fields existed on `/login` too, so the early test steps appeared to pass; the test only failed at the "Sign Up" button click, which had no equivalent on the login page.
+**Symptom:** Every auth test that called `page.goto('/signup')` ended up on `/login` instead. The Playwright trace showed the navigation completing — but to the wrong URL. The "Email" and "Password" fields existed on `/login` too, so the early test steps appeared to pass; the test only failed at the "Sign Up" button click, which had no equivalent on the login page.
 
 **What I tried first:** assumed the signup page didn't exist, then assumed it had wrong button text, then assumed Vue HMR was serving stale content. Spent 20 minutes on the wrong tree.
 
-**Actual cause:** I'd configured the Supabase Nuxt module's `redirectOptions.exclude` list with the public marketing routes (`/`, `/about`, `/projects`, etc.) and forgotten that `exclude` is an allowlist for unauthenticated access. Any route not in the list requires auth. So `/signup`, which by definition gets visited by people without accounts, was protected and the middleware was bouncing me to `/login`.
+**Actual cause:** I'd configured the Supabase Nuxt module's `redirectOptions.exclude` list with the public marketing routes (`/`, `/about`, `/projects`, etc.) and forgotten that `exclude` is an allowlist for unauthenticated access. Any route not in the list requires auth. So `/signup` — which by definition gets visited by people without accounts — was protected, and the middleware was bouncing me to `/login`.
 
-**Fix:** added `/signup` and `/login` to the exclude list. (`/login` matters too. Without it, visiting login while logged out triggers a redirect to login, which is at minimum awkward.) `/dashboard` deliberately stays out of the list because it's the protected route.
+**Fix:** added `/signup` and `/login` to the exclude list. (`/login` matters too — without it, visiting login while logged out triggers a redirect to login, which is at minimum awkward.) `/dashboard` deliberately stays out of the list because it's the protected route.
 
-**Lesson:** I would not have caught this for days by clicking through manually. The forms look superficially identical, the URL bar would have shown the redirect, and I'd have shrugged. The test caught it the moment it happened, *and* gave me a precise reproduction case I could debug in isolation. This is the actual argument for shift-left and not "tests catch bugs faster" but "tests turn ambiguous symptoms into precise reproductions, which is what actually saves time."
+**Lesson:** I would not have caught this for days by clicking through manually. The forms look superficially identical, the URL bar would have shown the redirect, and I'd have shrugged. The test caught it the moment it happened, *and* gave me a precise reproduction case I could debug in isolation. This is the actual argument for shift-left — not "tests catch bugs faster" but "tests turn ambiguous symptoms into precise reproductions, which is what actually saves time."
 
 ### Day 2, Issue #4 — When manual works and automation doesn't
 
 The signup → dashboard flow worked perfectly when I clicked through it manually in a browser. URL changed, session was created, dashboard rendered, email visible in the header. Every time.
 
-Under Playwright headless automation, the same flow failed. The page would stay on `/signup` even though the click had been dispatched, the handler had run, and Supabase had returned a session. I spent several hours on this proposing fixes, applying them, watching tests still fail, proposing more. The fixes addressed plausible causes (form submission bypassing Vue's event handler, the `useSupabaseUser()` ref lagging behind the auth listener, parallel workers stomping the dev server) but none of them moved the failure count.
+Under Playwright headless automation, the same flow failed. The page would stay on `/signup` even though the click had been dispatched, the handler had run, and Supabase had returned a session. I spent several hours on this — proposing fixes, applying them, watching tests still fail, proposing more. The fixes addressed plausible causes (form submission bypassing Vue's event handler, the `useSupabaseUser()` ref lagging behind the auth listener, parallel workers stomping the dev server) but none of them moved the failure count.
 
-Eventually I made the call to stop. The application code was working. I verified manually after every change. The bug was somewhere in the interaction between Vue Router's middleware, the Supabase Nuxt module's built-in auth gate, and Playwright's headless click timing. Not a simple race condition with a one-line fix. Probably solvable with another half-day of investigation. Definitely not solvable in the time I had left.
+Eventually I made the call to stop. The application code was working — verified manually after every change. The bug was somewhere in the interaction between Vue Router's middleware, the Supabase Nuxt module's built-in auth gate, and Playwright's headless click timing. Not a simple race condition with a one-line fix. Probably solvable with another half-day of investigation. Definitely not solvable in the time I had left.
 
 **The decision:** mark all four AUTH describes as `test.describe.skip(...)`, document the deferral honestly in `TESTING.md`, and verify the auth flow manually with a written checklist. Then move on to the rest of the test suite.
 
 **The lesson — which is the one I most want AutoGuru to take from this post:** the value of a test suite is not how many tests pass. It's whether the suite tells the truth about the application and whether it accelerates the team. A suite where failing tests get disabled to keep CI green is worse than a suite where a category is deferred honestly and explained. The first hides risk; the second exposes it. The first invites future commits that quietly break more tests because nobody trusts the signal; the second invites someone fresh to come back, read the deferral notes, and either fix the underlying issue or remove the deferral if it's no longer relevant.
 
-The auth tests are skipped. Not deleted, not silently passing, not commented out. They're documented as deferred, with the manual verification checklist that compensates for their absence. That's what "no flaky tests in this garage" looks like in practice.
+The auth tests are skipped. Not deleted, not silently passing, not commented out. They're documented as deferred, with the manual verification checklist that compensates for their absence. That's what "no flaky tests in this garage" looks like in practice — it's a culture, not a setting.
+
+**Postscript:** the root cause was eventually identified. The `@nuxtjs/supabase` module registers a global route middleware that redirects unauthenticated users to `/login` — but without a `?redirect=` parameter. A custom `auth.ts` middleware existed to handle the redirect correctly, but it was a *named* middleware (opt-in per page), so the module's global middleware always ran first and won the race. The fix: rename `auth.ts` → `auth.global.ts` so it registers as a global middleware and executes before the module-injected one; add `encodeURIComponent` to the redirect path; set `redirectOptions.exclude: ['/**']` to disable the module's built-in redirect entirely so there's only one redirect path. AUTH-001 through AUTH-004 now pass on Chromium and Firefox. WebKit failures under parallel load remain under investigation — likely a cookie SameSite/Secure attribute incompatibility between Supabase auth and Playwright's WebKit engine running over plain HTTP. Documented in TESTING.md.
 
 ### Day 3, Issue #5 — Email confirmation, rate limits, and a long lesson in Supabase auth modes
 
@@ -96,7 +96,7 @@ Day 3 was supposed to be plan CRUD. It started with a saga about Supabase email 
 
 The setup: AUTH-001 (signup) test creates a fresh user every run with `auth.signUp()`. After three or four runs, Supabase started rate-limiting on the free tier — the confirmation email it was trying to send tripped a per-hour cap. Tests couldn't proceed.
 
-**The first fix that didn't work:** I tried to turn off "Enable email provider" in Supabase auth settings. That's a bigger lever than I thought. It disables email-based signup *and* login. The seed user I'd manually created in Supabase suddenly couldn't authenticate either.
+**The first fix that didn't work:** I tried to turn off "Enable email provider" in Supabase auth settings. That's a bigger lever than I thought — it disables email-based signup *and* login. The seed user I'd manually created in Supabase suddenly couldn't authenticate either.
 
 **The second fix:** found the actually correct toggle, "Confirm email," buried under Authentication → Providers → Email. Turning that off means new signups don't trigger a confirmation email and the user has an immediately-usable session.
 
@@ -127,7 +127,7 @@ Diagnostic: Network tab was empty. Click handler wasn't even firing a request. C
 
 This is the substantive one for AutoGuru.
 
-After the plan CRUD UI was working, I wrote four API-level tests in `tests/api/plans.spec.ts` using Playwright's `request` fixture, no browser but just HTTP. Three of them are straightforward: 401 without auth, 400 for missing title, 201 for a valid create. The fourth is the one that matters:
+After the plan CRUD UI was working, I wrote four API-level tests in `tests/api/plans.spec.ts` using Playwright's `request` fixture — no browser, just HTTP. Three of them are straightforward: 401 without auth, 400 for missing title, 201 for a valid create. The fourth is the one that matters:
 
 > **GET /api/plans/:id returns 404 when accessing another user's plan.**
 >
@@ -143,9 +143,9 @@ This test took ~5 minutes to write once the helper was in place. It's the kind o
 
 ### Day 3, Issue #8 — Dual-mode auth: cookies for browsers, Bearer for APIs
 
-The browser tests use cookie-based auth which is Supabase's standard mode. The API tests can't, because there's no browser to manage cookies. They use `Authorization: Bearer <token>` headers instead, which is what mobile apps and integration partners would also use.
+The browser tests use cookie-based auth — Supabase's standard mode. The API tests can't, because there's no browser to manage cookies. They use `Authorization: Bearer <token>` headers instead, which is what mobile apps and integration partners would also use.
 
-The endpoint code originally only handled cookies via `serverSupabaseUser(event)`. To support both, I wrote `server/utils/getAuthedUser.ts`, a small helper that tries cookie auth first, then falls back to verifying the Bearer token against Supabase's auth API. Same helper handles both modes; same endpoints serve both kinds of client.
+The endpoint code originally only handled cookies via `serverSupabaseUser(event)`. To support both, I wrote `server/utils/getAuthedUser.ts` — a small helper that tries cookie auth first, then falls back to verifying the Bearer token against Supabase's auth API. Same helper handles both modes; same endpoints serve both kinds of client.
 
 **The win:** this isn't just test scaffolding. It's a real production capability. The API is now interoperable with anything that can send a Bearer header. Future expansion (mobile, integrations, scheduled scripts) doesn't need an API redesign.
 
@@ -178,7 +178,7 @@ GitHub Actions was running Node 20. Supabase's `realtime-js` library needs WebSo
 
 ### Day 4, Issue #10 — Writing the test found the bug; running it didn't matter
 
-The goal for this test was to enforce a single acceptance criterion: when AI generation fails, the user sees something. Not a stack trace, not a blank screen - a visible error.
+The goal for this test was to enforce a single acceptance criterion: when AI generation fails, the user sees something. Not a stack trace, not a blank screen — a visible error.
 
 Reviewing the existing handler in `ai-planner.vue` while drafting the test, I found this:
 
@@ -190,38 +190,19 @@ if (error.value) {
 }
 ```
 
-The error path was a TODO comment. The test caught the bug before I'd run the test. That's possible because writing the test forced me to read the code from the user's perspective *what should happen here?* , instead of the developer's *what does happen here?*
+The error path was a TODO comment. The test caught the bug before I'd run the test. That's possible because writing the test forced me to read the code from the user's perspective — *what should happen here?* — instead of the developer's — *what does happen here?*
 
-I added a visible error message. Verified manually by setting an invalid `OPENAI_API_KEY` and triggering generation: red alert, clear copy, no silent failure. The test infrastructure to enforce this is active in `tests/e2e/planner-failure.spec.ts`. Getting there took one more step: the original implementation used `useFetch`, which runs server-side during SSR hydration meaning `page.route()` couldn't intercept the request to `/api/plan-generate`. Migrating to `$fetch` (client-side) fixed the interception, and both the failure and success paths now run in CI.
+I added a visible error message. Verified manually by setting an invalid `OPENAI_API_KEY` and triggering generation: red alert, clear copy, no silent failure. The test infrastructure to enforce this is active in `tests/e2e/planner-failure.spec.ts`. Getting there took one more step: the original implementation used `useFetch`, which runs server-side during SSR hydration — meaning `page.route()` couldn't intercept the request to `/api/plan-generate`. Migrating to `$fetch` (client-side) fixed the interception, and both the failure and success paths now run in CI.
 
 The lesson is the broader one about shift-left: tests don't have to *pass* to be valuable. The act of designing the test against a clear acceptance criterion ("the user sees a visible error") forces you to confront whether your code actually does that. Often it doesn't, even when it "works" in the happy path. That's the work that distinguishes a quality engineering culture from a coverage-counting one.
 
-
 ### Day 4, Issue #11 — Yoga's error masking, and the choice not to fight it
 
-Writing the "unauthenticated GraphQL request" test, my assertion checked the error message for `/unauthenticated/i`. The test failed against `"Unexpected error."` which is Yoga's default response when a resolver throws. This is deliberate: leaking resolver errors to the client can expose internal details (database paths, stack traces, types). Yoga masks them and logs the real message server-side.
+Writing the "unauthenticated GraphQL request" test, my assertion checked the error message for `/unauthenticated/i`. The test failed against `"Unexpected error."` — Yoga's default response when a resolver throws. This is deliberate: leaking resolver errors to the client can expose internal details (database paths, stack traces, types). Yoga masks them and logs the real message server-side.
 
-The "correct" fix would be to throw `GraphQLError` with `extensions.code: 'UNAUTHENTICATED'`, this signals "client-safe, deliver as-is" and gives consumers a stable error code to branch on. The pragmatic fix I took was to match `/unexpected error/i` in the test. The test still proves what matters (auth failures don't return data, errors are surfaced in the response envelope), and the masking behaviour is correct for production.
+The "correct" fix would be to throw `GraphQLError` with `extensions.code: 'UNAUTHENTICATED'` — this signals "client-safe, deliver as-is" and gives consumers a stable error code to branch on. The pragmatic fix I took was to match `/unexpected error/i` in the test. The test still proves what matters (auth failures don't return data, errors are surfaced in the response envelope), and the masking behaviour is correct for production.
 
-**Lesson:** when a test wants you to fight framework defaults, ask whether the default is wrong or whether the test is wrong. In this case, both were partially right: masking is correct, but the test could be more useful with a typed error. Time pressure picked the simpler path; documenting the trade-off keeps it visible.
-
-### Day 4, Issue #12 — Unskipping the planner-failure test
-
-On Day 2 I'd marked the planner-failure test as `.skip` with a documented hypothesis: `useFetch` was running server-side during hydration, so `page.route()` (which only intercepts browser-side requests) couldn't see the call.
-
-Returning to it on Day 4, I switched `ai-planner.vue` from `useFetch` to `$fetch` — `$fetch` is always client-side, so `page.route()` could now intercept. But the tests still failed.
-
-Three layered bugs surfaced, in order:
-
-1. **Native form submission was bypassing Vue's `@submit.prevent`.** Same headless-mode timing issue I'd hit on Day 2 with the login form. The URL showed a trailing `?` after the click — the giveaway that the form submitted natively before Vue's listener caught it. Fix: change the button to `type="button"` with `@click="handleSubmit"` instead of relying on `type="submit"` + form interception. Same pattern, same fix as the auth pages.
-
-2. **The migration from `useFetch` to `$fetch` was incomplete.** I'd changed the call site but left `data.value.pages` in the success path — `useFetch` wraps the response in a Ref (hence `.value`), but `$fetch` returns the parsed body directly. Console showed `data.value is undefined` and I knew immediately. The lesson here is sharper than the fix: when migrating between two APIs that look similar but return differently-shaped values, the compiler can't help if both expressions are typed as `any`. A test caught what types didn't.
-
-3. **The mock response shape didn't match what the planner store expected.** Less severe: The shape I'd guessed had different field names than what the real `/api/plan-generate` returns. The success test failed because `planner.setPages` was getting unexpected data. Fixed by inspecting the actual API response in DevTools and updating the mock to mirror its shape exactly.
-
-The deeper observation across all three: each bug was caught by a different test failure mode (URL pattern, console error, missing UI). The test infrastructure was robust enough that each bug pointed at itself. That's what good test design buys you - failures that diagnose, not failures that obscure.
-
-The headless form-submission pattern is now a known issue I'd write a lint rule for in a larger codebase. Anywhere `type="submit"` exists with `@submit.prevent`, it's suspect under Playwright. Worth catching at PR-time rather than test-time.
+**Lesson:** when a test wants you to fight framework defaults, ask whether the default is wrong or whether the test is wrong. In this case, both were partially right — masking is correct, but the test could be more useful with a typed error. Time pressure picked the simpler path; documenting the trade-off keeps it visible.
 
 ---
 
@@ -251,7 +232,7 @@ A subset of these will land in the final version. Listed here while the week is 
 - **"No flaky tests" is a culture more than a setting.** It means investigating every intermittent failure, never retrying through them, and being willing to defer a test category honestly when investigation isn't yielding.
 - **Acceptance criteria as a deliverable, not a ceremony.** The doc was the highest-leverage thing I wrote all week. Future me reading the criteria for AUTH-004 knows exactly what behaviour the system promises, even if the test that enforces it is currently skipped.
 - **Test-first is faster *once you trust the setup*.** Day 1 was slower than just building. By Day 3 the loop was paying back, because every failure pointed at a specific gap instead of being noise.
-- **CI catches environment gaps that local dev can't.** Node 22 vs 20, missing secrets, dev server boot failures. All of these are invisible until CI fails. Diagnostic logging in the workflow is cheap and worth it.
+- **CI catches environment gaps that local dev can't.** Node 22 vs 20, missing secrets, dev server boot failures — all of these are invisible until CI fails. Diagnostic logging in the workflow is cheap and worth it.
 - **Good test infrastructure pushes you toward good production architecture.** The Bearer-token support added for tests is now a real production capability.
 - **Always pair negative tests with at least one positive test.** A suite full of "this fails when X" assertions can silently keep passing even if the system is broken in every direction. The happy-path "owner can read their own plan" test in the GraphQL suite isn't a security test, it's a sanity check that proves the system can return data at all. Without it, the cross-user RLS test would pass even if GraphQL was returning null for every query regardless of auth. Negative tests prove "X is blocked"; positive tests prove "the system also works when it should." Both are required.
 ---
@@ -259,7 +240,8 @@ A subset of these will land in the final version. Listed here while the week is 
 ## What I'd do with more time
 
 - **Cross-user authorisation tests for every endpoint, not just GET.** PATCH and DELETE deserve the same treatment. Easy to add now that the helper exists.
-- **Visual regression with Playwright snapshots** for the marketing pages. Tailwind regressions are otherwise invisible.
+- **Resolve WebKit auth failures under parallel load.** All six webkit auth failures share the same symptom: the page stays on `/signup` or `/login` after a successful Supabase `signUp`/`signInWithPassword` call — the session is created but the redirect doesn't fire. The likely cause is a cookie `SameSite`/`Secure` attribute that WebKit rejects on plain HTTP (`localhost`). Possible fixes: configure Playwright to run WebKit over HTTPS in local testing, or switch Supabase session storage to `localStorage` for the test environment.
+- **Visual regression with Playwright snapshots** for the marketing pages — Tailwind regressions are otherwise invisible.
 - **BDD with Cucumber/Gherkin** if the team prefers human-readable specs. The acceptance criteria are already in plain English; a thin Gherkin wrapper would let non-engineers read the test suite.
 - **Performance/load testing with k6** against the API endpoints. Not yet relevant for this product but a useful skill to demonstrate.
 - **Mutation testing with Stryker** to verify test quality, not just coverage. Currently the test suite has no measure of how good its assertions are; mutation testing fills that gap.
