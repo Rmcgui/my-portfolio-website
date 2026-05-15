@@ -5,14 +5,16 @@ import { signupAndLogin, loginAsSeedUser, uniqueEmail, SEED_USER } from '../help
 // AUTH-001: Signup
 // Each signup test creates a fresh user via uniqueEmail() so tests don't collide.
 // =============================================================================
-test.describe.skip('AUTH-001: Signup', () => {
+test.describe('AUTH-001: Signup', () => {
   test('successful signup redirects to dashboard', async ({ page }) => {
     const email = uniqueEmail();
     await page.goto('/signup');
+    await page.waitForLoadState('networkidle')
     //await page.pause()
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password').fill('password123');
     await page.getByRole('button', { name: /sign up/i }).click();
+    await page.waitForLoadState('networkidle')
 
     await expect(page).toHaveURL('/dashboard');
     await expect(page.getByText(email)).toBeVisible();
@@ -20,6 +22,7 @@ test.describe.skip('AUTH-001: Signup', () => {
 
   test('invalid email shows inline validation error', async ({ page }) => {
     await page.goto('/signup');
+    await page.waitForLoadState('networkidle')   
     await page.getByLabel('Email').fill('not-an-email');
     await page.getByLabel('Password').fill('password123');
     await page.getByRole('button', { name: /sign up/i }).click();
@@ -30,6 +33,7 @@ test.describe.skip('AUTH-001: Signup', () => {
 
   test('short password shows inline validation error', async ({ page }) => {
     await page.goto('/signup');
+    await page.waitForLoadState('networkidle')   
     await page.getByLabel('Email').fill(uniqueEmail());
     await page.getByLabel('Password').fill('short');
     await page.getByRole('button', { name: /sign up/i }).click();
@@ -41,6 +45,7 @@ test.describe.skip('AUTH-001: Signup', () => {
   test('duplicate email shows server error', async ({ page }) => {
     // Use the seed user — it definitely already exists in Supabase
     await page.goto('/signup');
+    await page.waitForLoadState('networkidle')   
     await page.getByLabel('Email').fill(SEED_USER.email);
     await page.getByLabel('Password').fill('password123');
     await page.getByRole('button', { name: /sign up/i }).click();
@@ -55,9 +60,10 @@ test.describe.skip('AUTH-001: Signup', () => {
 // Uses the persistent SEED_USER — no signup-then-login dance.
 // Faster, cleaner, doesn't create new users for read-only tests.
 // =============================================================================
-test.describe.skip('AUTH-002: Login', () => {
+test.describe('AUTH-002: Login', () => {
   test('valid credentials log in and redirect to dashboard', async ({ page }) => {
     await page.goto('/login');
+    await page.waitForLoadState('networkidle')   
     await page.getByLabel('Email').fill(SEED_USER.email);
     await page.getByLabel('Password').fill(SEED_USER.password);
     await page.getByRole('button', { name: /log in/i }).click();
@@ -68,6 +74,7 @@ test.describe.skip('AUTH-002: Login', () => {
 
   test('invalid credentials show generic error', async ({ page }) => {
     await page.goto('/login');
+    await page.waitForLoadState('networkidle')   
     await page.getByLabel('Email').fill(uniqueEmail()); // never registered
     await page.getByLabel('Password').fill('password123');
     await page.getByRole('button', { name: /log in/i }).click();
@@ -83,6 +90,7 @@ test.describe.skip('AUTH-002: Login', () => {
     await loginAsSeedUser(page);
     // Now try to visit /login while authenticated
     await page.goto('/login');
+    await page.waitForLoadState('networkidle')
     await expect(page).toHaveURL('/dashboard');
   });
 });
@@ -92,10 +100,10 @@ test.describe.skip('AUTH-002: Login', () => {
 // Each test signs up a fresh user via the helper, then exercises logout.
 // Fresh users means no test-order dependencies.
 // =============================================================================
-test.describe.skip('AUTH-003: Logout', () => {
+test.describe('AUTH-003: Logout', () => {
   test('logout button is visible and ends the session', async ({ page }) => {
     await signupAndLogin(page, uniqueEmail());
-
+    await page.waitForLoadState('networkidle')  
     const logoutButton = page.getByRole('button', { name: /log out/i });
     await expect(logoutButton).toBeVisible();
 
@@ -105,11 +113,13 @@ test.describe.skip('AUTH-003: Logout', () => {
 
   test('after logout, dashboard redirects to login', async ({ page }) => {
     await signupAndLogin(page, uniqueEmail());
+    await page.waitForLoadState('networkidle')  
     await page.getByRole('button', { name: /log out/i }).click();
     await expect(page).toHaveURL('/');
-
+    await page.waitForLoadState('networkidle')  
     // Try to visit dashboard now
     await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle')
     await expect(page).toHaveURL(/\/login/);
   });
 });
@@ -118,16 +128,19 @@ test.describe.skip('AUTH-003: Logout', () => {
 // AUTH-004: Protected route
 // Uses the seed user for the redirect-after-login flow — simpler than signup.
 // =============================================================================
-test.describe.skip('AUTH-004: Protected route', () => {
+test.describe('AUTH-004: Protected route', () => {
   test('unauthenticated visitor to /dashboard is redirected to /login', async ({ page }) => {
     await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle')
     await expect(page).toHaveURL(/\/login/);
   });
 
   test('after login, user is sent back to originally requested page', async ({ page }) => {
     // Try to visit dashboard while logged out — should redirect with ?redirect=
     await page.goto('/dashboard');
-    await expect(page).toHaveURL(/\/login\?redirect=%2Fdashboard/);
+    await page.waitForLoadState('networkidle')
+    // Vue Router normalises %2F → / in query param values, so accept either form
+    await expect(page).toHaveURL(/\/login\?redirect=(%2F|\/)dashboard/);
 
     // Log in from the redirected page using the seed user
     await page.getByLabel('Email').fill(SEED_USER.email);

@@ -49,13 +49,15 @@ export default defineNuxtConfig({
   
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/sitemap', '@nuxtjs/supabase'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/sitemap', '@nuxtjs/supabase', '@nuxt/content'],
   supabase: {
-  redirectOptions: {
-    login: '/login',
-    callback: '/confirm',
-    // Public routes — everything else requires auth
-    exclude: ['/', '/about', '/process', '/projects', '/contact', '/ai-planner', '/signup', '/login'],
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm',
+      // Public routes — everything else requires auth
+      // All protected routes are handled by auth.global.ts (which appends ?redirect=).
+      // Exclude everything here so the module's built-in middleware doesn't race with ours.
+      exclude: ['/**'],
+    },
   },
-},
 })

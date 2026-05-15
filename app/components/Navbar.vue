@@ -39,15 +39,22 @@
           >
             Projects
           </NuxtLink>
-                    <NuxtLink 
-            to="/ai-planner" 
+                    <NuxtLink
+            to="/ai-planner"
             class="text-gray-600 hover:text-blue-600 transition-colors duration-200 font-medium"
             :class="{ 'text-blue-600 font-semibold': $route.path === '/ai-planner' }"
           >
             AI Planner
           </NuxtLink>
-          <NuxtLink 
-            to="/contact" 
+          <NuxtLink
+            to="/blog"
+            class="text-gray-600 hover:text-blue-600 transition-colors duration-200 font-medium"
+            :class="{ 'text-blue-600 font-semibold': $route.path.startsWith('/blog') }"
+          >
+            Blog
+          </NuxtLink>
+          <NuxtLink
+            to="/contact"
             class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
           >
             Contact
@@ -103,16 +110,24 @@
           >
             Projects
           </NuxtLink>
-          <NuxtLink 
-            to="/ai-planner" 
+          <NuxtLink
+            to="/ai-planner"
             class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-all font-medium"
             :class="{ 'text-blue-600 bg-blue-50 font-semibold': $route.path === '/ai-planner' }"
             @click="closeMenu"
           >
-          AI Planner 
+            AI Planner
           </NuxtLink>
-          <NuxtLink 
-            to="/contact" 
+          <NuxtLink
+            to="/blog"
+            class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-all font-medium"
+            :class="{ 'text-blue-600 bg-blue-50 font-semibold': $route.path.startsWith('/blog') }"
+            @click="closeMenu"
+          >
+            Blog
+          </NuxtLink>
+          <NuxtLink
+            to="/contact"
             class="block bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center shadow-md"
             @click="closeMenu"
           >
