@@ -1,3 +1,11 @@
+---
+title: Building a Playwright Test Suite for an AI-Powered Web App in Four Days
+date: "2026-05-14"
+description: How I built a multi-layer Playwright suite — E2E, REST, GraphQL — on an AI-powered Nuxt 4 app in four days, wired into GitHub Actions CI, with a shift-left workflow and a cross-user RLS authorisation test.
+tags: ["playwright", "testing", "nuxt", "supabase", "graphql"]
+readTime: "15 min read"
+---
+
 # Building a Playwright Test Suite for an AI-Powered Web App in Four Days
 
 AutoGuru is hiring an Automation Test Engineer. Their stack is Playwright, GraphQL, and AI tooling like Claude Code, and their job description spells out a culture I want to work in: quality engineers embedded with developers, no flaky tests, shift-left as a default rather than a slogan. I'm a full-stack developer, not a career tester — so rather than apply on the strength of a CV alone, I gave myself four days to put their stack into practice on my own product. This post is what I built, what worked, and what I'd do differently.
@@ -10,7 +18,7 @@ The existing site is [webdesignbyryan.com](https://webdesignbyryan.com) — a Nu
 
 Rather than spin up a fresh project for this exercise, I chose to build tests around that existing feature. The reasoning: AutoGuru's engineers work with live product features, not greenfield demos. A suite against a working system has to deal with real state, third-party API costs, SSR/client hydration boundaries, and the gaps between what code does and what it was supposed to do. Those are the interesting problems.
 
-The constraint I set: four days. Day 1 — smoke tests and Playwright setup. Day 2 — auth tests. Day 3 — REST API tests and plan CRUD. Day 4 — GraphQL, OpenAI mocking, and the AI planner failure path. Tight enough to force honest scope decisions, long enough to demonstrate depth in each layer. The scope that didn't make it: visual regression, load testing, full E2E auth resolution is documented honestly in "What I'd do with more time."
+The constraint I set: four days. Day 1 — smoke tests and Playwright setup. Day 2 — auth tests. Day 3 — REST API tests and plan CRUD. Day 4 — GraphQL, OpenAI mocking, and the AI planner failure path. Tight enough to force honest scope decisions, long enough to demonstrate depth in each layer. The scope that didn't make it: visual regression, load testing, and mutation testing. 
 
 ---
 
